@@ -1,0 +1,2007 @@
+{
+  "name": "main",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gmail.googleapis.com/gmail/v1/users/jalloulieya27@gmail.com/watch",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "gmailOAuth2",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"topicName\":\"projects/onbording-500608/topics/gmail-onboarding\",\"labelIds\":[\"INBOX\"]}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -288,
+        -496
+      ],
+      "id": "54f8d7c4-7054-4b54-b495-21cd02f8e8e1",
+      "name": "HTTP Request",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "WVafeGatVigO9G7A",
+          "name": "Gmail account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gmail-trigger",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        -512
+      ],
+      "id": "c70c9625-6623-4048-a2ab-dc1a1f4bda57",
+      "name": "Webhook1",
+      "webhookId": "b857ff1c-9e2b-4739-8c2d-0d7c4b7a6be9"
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "get",
+        "threadId": "={{ $json.threadId }}",
+        "simple": false,
+        "options": {
+          "returnOnlyMessages": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        -512
+      ],
+      "id": "aa51ad26-c265-4345-bdd4-09ba3c47f228",
+      "name": "Get a thread",
+      "webhookId": "01795930-a611-4bfa-a449-9dd5591793f1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "WVafeGatVigO9G7A",
+          "name": "Gmail account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 1,
+        "simple": false,
+        "filters": {
+          "readStatus": "unread"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        -512
+      ],
+      "id": "673c8011-cd72-4f35-83b6-48ee57c79f42",
+      "name": "Get many messages",
+      "webhookId": "1ceeaf21-31af-4e34-a590-04a9b396f50f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "WVafeGatVigO9G7A",
+          "name": "Gmail account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tu es un assistant pour un cabinet comptable.\n\nLis ce thread email et détermine s'il s'agit d'un email d'ONBOARDING \n(un client nouveau ou prospect qui exprime la volonté de commencer \nune collaboration avec le cabinet), et réponds à cette question :\n\nLe client exprime-t-il une volonté de travailler avec le cabinet \n(demande de prise en charge, de transfert de dossier, ou de \ncollaboration) ?\n\nÉtape 1 — Vérifie d'abord que le thread concerne bien un contexte \nd'onboarding. Rejette immédiatement (accord: false) si le thread est :\n- un email interne du cabinet, sans rapport avec un client externe\n- une newsletter, un email publicitaire, une notification automatique\n- une facture, un rappel de paiement, ou un sujet administratif \n  sans rapport avec une prise en charge de dossier\n- un échange avec un client DÉJÀ existant sur une question courante \n  (ex: question comptable ponctuelle, demande de document, suivi \n  d'un dossier déjà en cours) — ce n'est PAS un onboarding\n- tout message qui n'implique pas explicitement le début d'une \n  nouvelle relation client avec le cabinet\n\nÉtape 2 — Si (et seulement si) le thread concerne bien un contexte \nd'onboarding, considère comme \"accord\" toute demande explicite du \nclient visant à :\n- confier sa comptabilité au cabinet\n- transférer son dossier depuis un autre cabinet\n- demander un accompagnement juridique, de paie, ou comptable\n- toute formulation indiquant une intention de collaborer, même \n  sans contrat signé ni formule du type \"je confirme\"\n\nNe considère PAS comme accord :\n- une simple demande d'information ou de devis sans intention \n  claire de collaborer\n- un message purement informatif sans demande d'action\n- tout ce qui a été exclu à l'étape 1\n\nThread :\nExpéditeur : {{ $json.messages[0].From }}\nObjet : {{ $json.messages[0].Subject }}\nContenu : {{ $json.messages[0].payload.parts[0].parts[0].body.data }}\n\nRéponds UNIQUEMENT avec ce JSON sans markdown ni backticks :\n{\"accord\": true, \"raison\": \"explication courte\"}\nou\n{\"accord\": false, \"raison\": \"explication courte\"}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        528,
+        -512
+      ],
+      "id": "c250d801-4cfb-4908-8175-147fd575d65f",
+      "name": "Basic LLM Chain-Filtre Accord Client"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2769ac6d-68a8-4d74-9396-544b5ea8fae9",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "\"accord\": true",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        800,
+        -512
+      ],
+      "id": "fc6e5281-04a3-4c17-ae39-a5f9548b08e5",
+      "name": "If-Accord Donné"
+    },
+    {
+      "parameters": {
+        "jsCode": "const messages = $('Get a thread').first().json.messages || [];\nconst attachments = [];\nconst vus = new Set();\n\nconst typesAutorises = [\n  'application/pdf',\n  'image/jpeg', \n  'image/png',\n  'image/jpg',\n  'application/msword',\n  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'\n];\n\nfunction extractAttachments(parts, messageId) {\n  if (!parts) return;\n  for (const part of parts) {\n    if (part.body?.attachmentId && part.filename && typesAutorises.includes(part.mimeType)) {\n      if (!vus.has(part.filename)) {\n        vus.add(part.filename);\n        attachments.push({\n          messageId,\n          attachmentId: part.body.attachmentId,\n          filename: part.filename,\n          mimeType: part.mimeType\n        });\n      }\n    }\n    if (part.parts) extractAttachments(part.parts, messageId);\n  }\n}\n\nfor (const msg of messages) {\n  if (msg.payload?.parts) extractAttachments(msg.payload.parts, msg.id);\n}\n\nif (attachments.length === 0) return [{ json: { statut: 'aucune_piece_jointe' } }];\nreturn attachments.map(att => ({ json: att }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        -544
+      ],
+      "id": "e7b8188d-c043-40bd-bd43-4c6d5795adfe",
+      "name": "JS-Extraire Pièces Jointes"
+    },
+    {
+      "parameters": {
+        "binaryData": true,
+        "type": "MD5",
+        "dataPropertyName": "hash"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        -560
+      ],
+      "id": "28e46dc8-96b9-400b-8856-55d6244474c8",
+      "name": "Crypto-Hash MD5 Fichier"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst hashVus = new Set();\nconst resultats = [];\n\nfor (const item of items) {\n  const hash = item.json.hash || '';\n  if (hashVus.has(hash)) continue;\n  hashVus.add(hash);\n\n  resultats.push({\n    json: {\n      filename: item.json.filename || 'document',\n      mimeType: item.json.mimeType || '',\n      hash,\n      texteOCR: item.json.text || '',\n      messageId: item.json.messageId || '',\n      attachmentId: item.json.attachmentId || '',\n      malware: item.json.malware || false,\n      statut: 'valide'\n    }\n  });\n}\n\nif (resultats.length === 0) {\n  return [{ json: { statut: 'aucun_fichier_valide' } }];\n}\nreturn resultats;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1728,
+        -560
+      ],
+      "id": "8911b207-ffb9-45d2-b8cc-059514fcf9b7",
+      "name": "JS-Dédupliquer "
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "63027350-b13c-4d62-9583-4fa5ed557528",
+              "leftValue": "={{ $json.statut }}",
+              "rightValue": "valide",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1856,
+        -560
+      ],
+      "id": "b09346e9-85f0-475d-b537-a900db9dd106",
+      "name": "If- Fichiers Valides"
+    },
+    {
+      "parameters": {
+        "jsCode": "function getBody(payload) {\n  if (!payload) return '';\n  \n  if (payload.body?.data) {\n    return Buffer.from(payload.body.data, 'base64').toString('utf-8');\n  }\n  \n  if (payload.parts) {\n    for (const part of payload.parts) {\n      if (part.mimeType === 'text/plain' && part.body?.data) {\n        return Buffer.from(part.body.data, 'base64').toString('utf-8');\n      }\n    }\n    for (const part of payload.parts) {\n      const nested = getBody(part);\n      if (nested) return nested;\n    }\n  }\n  \n  return '';\n}\n\nconst messages = $('Get a thread').first().json.messages || [];\nconst texteEmails = messages.map(m => {\n  const h = m.payload?.headers || [];\n  const de = h.find(x => x.name === 'From')?.value || '';\n  const sujet = h.find(x => x.name === 'Subject')?.value || '';\n  const corps = getBody(m.payload) || m.snippet || '';\n  return `De: ${de} | Objet: ${sujet}\\n${corps}`;\n}).join('\\n---\\n');\n\nconst items = $input.all();\nconst hashVus = new Set();\nconst fichiers = [];\nconst today = new Date().toISOString().split('T')[0];\nconst nomSociete = 'SOCIETE';\n\nfor (const item of items) {\n  const hash = item.json.hash || '';\n  if (hashVus.has(hash)) continue;\n  hashVus.add(hash);\n\n  fichiers.push({\n    filename: `${today}_${nomSociete}_${item.json.filename || 'document'}`,\n    filenameOriginal: item.json.filename || 'document',\n    mimeType: item.json.mimeType || '',\n    hash,\n    texteOCR: item.json.text || item.json.texteOCR || '',\n    messageId: item.json.messageId || '',\n    attachmentId: item.json.attachmentId || '',\n    malware: item.json.malware || false,\n    statut: 'valide'\n  });\n}\n\nconst texteOCR = fichiers.map((f, i) =>\n  `=== Fichier ${i+1} : ${f.filenameOriginal} ===\\n${f.texteOCR}`\n).join('\\n\\n');\n\nconst clientId = `CLI-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;\n\nreturn [{ json: { texteEmails, texteOCR, fichiers, clientId, today } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2080,
+        -560
+      ],
+      "id": "1918ac0c-14e1-45e7-ba96-2f7cb56f0589",
+      "name": "JS-Préparer Données Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tu es un assistant pour Colead Finance, cabinet comptable.\n\nÉTAPES OBLIGATOIRES DANS L'ORDRE :\n1. Analyse les EMAILS et PIÈCES JOINTES OCR fournis\n2. Extrais, en vérifiant la cohérence entre les EMAILS et les PIÈCES JOINTES OCR pour chaque champ :\n   - nom_societe : nom exact de la société. Si le nom mentionné dans l'email et celui trouvé dans les pièces jointes (ex: Kbis) sont clairement différents et incompatibles, mets \"Erreur\" dans ce champ.\n   - email_expediteur : l'adresse email brute de l'expéditeur du message, telle que fournie dans {{ $json.expediteurBrut }}, sans aucun traitement ni filtrage. Recopie-la telle quelle.\n   - email_client : l'adresse email du client, qui doit TOUJOURS être différente de email_expediteur ci-dessus. Cherche dans le corps de l'email (destinataires, signatures, adresses mentionnées) ou dans les pièces jointes une adresse email distincte de email_expediteur. Ignore également toute adresse contenant \"colead\" ou \"onboarding\" (insensible à la casse), ou les adresses jalloulieya27@gmail.com et eyajallouli0808@gmail.com, qui sont toujours internes au cabinet. Si aucune adresse valide et différente de email_expediteur n'est trouvée, mets \"Non renseigné\".\n   - siret : 14 chiffres sans espaces. Si le SIRET mentionné dans l'email et celui trouvé dans les pièces jointes sont différents, mets \"Erreur\" dans ce champ. Si absent partout, mets \"Non renseigné\".\n   - parcours : \"creation\" si nouvelle société / \"existante\" si société active / \"confrere\" si transfert cabinet\n   - paie : true si gestion de paie mentionnée / sinon false\n   - juridique : true si juridique ou statuts mentionnés / sinon false\n   - id : utilise directement la valeur fournie dans {{ $json.clientId }}, ne la génère pas toi-même\n\n3. Retourne UNIQUEMENT ce JSON et rien d'autre :\n{\n  \"id\": \"...\",\n  \"nom_societe\": \"...\",\n  \"email_expediteur\": \"...\",\n  \"email_client\": \"...\",\n  \"siret\": \"...\",\n  \"parcours\": \"...\",\n  \"paie\": \"...\",\n  \"juridique\": \"...\"\n}\n\nRÈGLES :\n- Si une info est absente partout (email ET pièces jointes), mets \"Non renseigné\"\n- Si une info est présente mais incohérente entre l'email et les pièces jointes, mets \"Erreur\" dans ce champ précis uniquement\n- email_client doit TOUJOURS être différent de email_expediteur — ne jamais recopier la même valeur dans les deux champs\n- email_client ne doit jamais contenir \"colead\" ou \"onboarding\", ni être l'une des adresses internes fixes du cabinet\n- Ne jamais inclure feu_vert dans le JSON\n- Ne retourne RIEN d'autre que le JSON — pas d'explication, pas de texte avant ou après\n\nEMAILS :\n{{ $json.texteEmails }}\n\nPIÈCES JOINTES OCR :\n{{ $json.texteOCR }}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2256,
+        -544
+      ],
+      "id": "ca2b7b40-ea83-49f3-a9e2-01086ed9e867",
+      "name": "AI Agent-Extraction Client"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.RA }}",
+        "subject": "=Nouveau client à valider — {{ JSON.parse($('AI Agent-Extraction Client').item.json.output.replace(/```json|```/g, '').trim()).nom_societe }}",
+        "message": "=<p>Bonjour,</p>\n<p>Un nouveau client a été ajouté et nécessite votre validation.</p>\n<p>\n<strong>ID client :</strong> {{ $('JS-Préparer Données Agent').item.json.clientId }}<br>\n<strong>Société :</strong> {{ JSON.parse($('AI Agent-Extraction Client').item.json.output.replace(/```json|```/g, '').trim()).nom_societe }}\n</p>\n\n<p>\n<strong>Fichiers reçus :</strong><br>\n{{ $('HTTP Request2').item.json.files && $('HTTP Request2').item.json.files.length > 0 ? $('HTTP Request2').item.json.files.map(f => f.name).join('<br>') : 'Aucun fichier' }}\n</p>\n<p>Merci de consulter la fiche dans le Google Sheet \"Clients\" pour validation (colonne <strong>feu_vert</strong>).</p>\n<p>Cordialement,<br>\nSystème automatique Colead Finance</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        4064,
+        -400
+      ],
+      "id": "c93bc749-27c0-41db-853f-5ed54e2c7677",
+      "name": "Send a message",
+      "webhookId": "b7a65584-5bc2-46b0-959c-02cfd151784a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "WVafeGatVigO9G7A",
+          "name": "Gmail account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "yi2XrzCJ0pNhG09r",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/yi2XrzCJ0pNhG09r",
+          "cachedResultName": "Créer Dossier et Uploader PDF"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "output": "={{ $('AI Agent-Extraction Client').first().json.output }}",
+            "JSDdupliquer__allItems": "={{ $('JS-Dédupliquer ').all() }}",
+            "output_firstItem": "={{ $('AI Agent-Extraction Client').first().json.output }}"
+          },
+          "matchingColumns": [
+            "output",
+            "JSDdupliquer__allItems",
+            "output_firstItem"
+          ],
+          "schema": [
+            {
+              "id": "output",
+              "displayName": "output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "JSDdupliquer__allItems",
+              "displayName": "JSDdupliquer__allItems",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "output_firstItem",
+              "displayName": "output_firstItem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "folderId",
+              "displayName": "folderId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        3312,
+        -432
+      ],
+      "name": "Call Créer Dossier et Uploader PDF",
+      "id": "9f0d16fc-6ea9-4857-b3dd-c3326bee598a"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Aa5OaMhAGgUESmrH",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Aa5OaMhAGgUESmrH",
+          "cachedResultName": "traitementPJ"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "messageId": "={{ $json.messageId }}",
+            "filename": "={{ $json.filename }}",
+            "attachmentId": "={{ $json.attachmentId }}",
+            "mimeType": "={{ $json.mimeType }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "attachmentId",
+              "displayName": "attachmentId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "messageId",
+              "displayName": "messageId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "filename",
+              "displayName": "filename",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "mimeType",
+              "displayName": "mimeType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1216,
+        -560
+      ],
+      "id": "74fd97c8-34b6-402e-ad8e-cf133fa7b8a3",
+      "name": "Call 'traitementPJ'"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "0",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2544,
+        -560
+      ],
+      "id": "f7b2bf72-a37a-4718-9812-05d349d9f2ce",
+      "name": "Lire Clients Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yW3qIuEycEdH1mcz",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9035e184-69b5-4030-94ab-ea96d77c71f3",
+              "leftValue": "={{ $json.isDuplicate }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2928,
+        -560
+      ],
+      "id": "669b903d-11cf-426c-9ffb-f89541c70d4a",
+      "name": "If-Doublon Trouvé"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Feuille 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JR8Strqf_iTYnM7RZD-mrg1GW652K58egB6Ela7pdQw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "date": "={{ $('JS-Préparer Données Agent').item.json.today }}   ",
+            "nom_société": "={{ $json.nom_societe }}",
+            "email_client": "={{ $json.email_client }}",
+            "parcours": "={{ $json.parcours }}",
+            "paie": "={{ $json.paie }}",
+            "juridique": "={{ $json.juridique }}",
+            "siret": "={{ $json.siret }}",
+            "Associé": "={{ $json.email_expediteur}}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nom_société",
+              "displayName": "nom_société",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email_client",
+              "displayName": "email_client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "siret",
+              "displayName": "siret",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "parcours",
+              "displayName": "parcours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "paie",
+              "displayName": "paie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "juridique",
+              "displayName": "juridique",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "feu_vert",
+              "displayName": "feu_vert",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Associé",
+              "displayName": "Associé",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3136,
+        -432
+      ],
+      "id": "0413b352-4bad-4ea0-a630-256bb24c3fc1",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yW3qIuEycEdH1mcz",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "kUnmmKcpkBvfwTla",
+          "mode": "list",
+          "cachedResultName": "My Sub-Workflow 3",
+          "cachedResultUrl": "/workflow/kUnmmKcpkBvfwTla"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "output": "={{ $('AI Agent-Extraction Client').first().json.output }}",
+            "JSDdupliquer__allItems": "={{ $('JS-Filtrer Nouveaux Fichiers').all() }}",
+            "output_firstItem": "={{ $('AI Agent-Extraction Client').first().json }}",
+            "folderId": "={{ $('Rechercher Dossier Drive').first().json.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "output",
+              "displayName": "output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "JSDdupliquer__allItems",
+              "displayName": "JSDdupliquer__allItems",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "output_firstItem",
+              "displayName": "output_firstItem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "folderId",
+              "displayName": "folderId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        4192,
+        -736
+      ],
+      "name": "Call Créer Dossier et Uploader PDF1",
+      "id": "ecb82298-313c-446c-bb92-23233ea62887"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ JSON.parse($('AI Agent-Extraction Client').item.json.output).nom_societe }} - À valider",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3392,
+        -688
+      ],
+      "id": "4d6b3172-b8d7-4dda-83c2-d5216bf2d73f",
+      "name": "Rechercher Dossier Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "T9mgdxC1uhFV5HN6",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/drive/v3/files?q='{{ $('Rechercher Dossier Drive').first().json.id }}' in parents&fields=files(id,name,md5Checksum,description)",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3568,
+        -704
+      ],
+      "id": "306a05d2-6fc0-46d3-8d23-15165e7dfcdb",
+      "name": "HTTP Request1",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "T9mgdxC1uhFV5HN6",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "11789373-08f7-49ee-85c5-8aa53035b102",
+              "leftValue": "={{ $json.hasNewFiles }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3904,
+        -720
+      ],
+      "id": "b5d1fc7d-8813-4f15-a693-15c9306bc98d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Node: JS-Filtrer Nouveaux Fichiers\n// Mode : Run Once for All Items\n// Le hash Gmail est maintenant calculé sur le PDF décodé = identique au md5Checksum Drive\n\n// ---------- MD5 des fichiers existants dans Drive ----------\nconst driveResponse = $('HTTP Request1').first().json;\nconst existingFiles = driveResponse.files || [];\nconst existingMD5s = new Set(existingFiles.map(f => f.md5Checksum).filter(Boolean));\n\n// ---------- Nouveaux fichiers depuis JS-Dédupliquer ----------\nconst newFiles = $('JS-Dédupliquer ').all();\n\n// ---------- Déduplication ----------\nconst seenHashes = new Set();\nconst uniqueNewFiles = [];\n\nfor (const item of newFiles) {\n  const f = item.json;\n  const hash = f.hash; // MD5 du PDF décodé = même que Drive\n\n  if (!hash) continue;\n\n  // Doublon parmi les nouveaux ?\n  if (seenHashes.has(hash)) continue;\n  seenHashes.add(hash);\n\n  // Déjà présent dans Drive ?\n  if (existingMD5s.has(hash)) continue;\n\n  uniqueNewFiles.push({ json: { ...f, hasNewFiles: true } });\n}\n\n// ---------- Sortie ----------\nif (uniqueNewFiles.length === 0) {\n  return [{ json: { hasNewFiles: false, count: 0 } }];\n}\n\nreturn uniqueNewFiles;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3744,
+        -720
+      ],
+      "id": "18c7d46b-2372-4bc6-b214-528bea234880",
+      "name": "JS-Filtrer Nouveaux Fichiers"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Node: JS-Fusionner Champs Vides\n// Mode : Run Once for All Items\n// Règle : \n//   - Complète les champs vides/FALSE avec les nouvelles valeurs\n//   - Met à jour les champs qui ont changé (differences détectées par JS-Détecter Doublon)\n\nconst detected = $('Js detecter doublon').first().json;\nconst oldData = detected.existingRowData || {};\nconst differences = detected.differences || [];\n\nfunction isEmptyValue(v) {\n  if (v === undefined || v === null) return true;\n  const s = String(v).trim().toUpperCase();\n  return s === '' || s === 'FALSE' || s === 'NON RENSEIGNÉ';\n}\n\nconst fieldsToMerge = ['nom_société', 'email_client', 'siret', 'parcours', 'paie', 'juridique'];\nconst merged = { ...oldData };\nconst changedFields = [];\n\n// Construire un dictionnaire des champs qui ont changé\nconst diffMap = {};\nfor (const diff of differences) {\n  diffMap[diff.field] = diff.nouveau;\n}\n\nfor (const field of fieldsToMerge) {\n  const oldVal = oldData[field];\n  const newVal = detected[field] !== undefined\n    ? detected[field]\n    : detected[field.replace('é', 'e').replace('è', 'e')];\n\n  // Cas 1 : champ vide/FALSE → compléter avec la nouvelle valeur\n  if (isEmptyValue(oldVal) && !isEmptyValue(newVal)) {\n    merged[field] = newVal;\n    changedFields.push(field);\n  }\n  // Cas 2 : champ différent détecté par differences → remplacer par la nouvelle valeur\n  else if (diffMap[field] !== undefined) {\n    merged[field] = diffMap[field];\n    changedFields.push(field);\n  }\n}\n\nreturn {\n  json: {\n    ...merged,\n    existingRowNumber: detected.existingRowNumber,\n    changedFields,\n    hasChanges: changedFields.length > 0\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3680,
+        -1088
+      ],
+      "id": "d378ca18-8766-46ab-be29-bad15f9673ba",
+      "name": "JS-Fusionner Champs"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "id",
+          "value": "gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "email_client": "={{ $json.email_client }}",
+            "siret": "={{ $json.siret }}",
+            "parcours": "={{ $json.parcours }}",
+            "paie": "={{ $json.paie }}",
+            "juridique": "={{ $json.juridique }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nom_société",
+              "displayName": "nom_société",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email_client",
+              "displayName": "email_client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "siret",
+              "displayName": "siret",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "parcours",
+              "displayName": "parcours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "paie",
+              "displayName": "paie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "juridique",
+              "displayName": "juridique",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "feu_vert",
+              "displayName": "feu_vert",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Associé",
+              "displayName": "Associé",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3952,
+        -1120
+      ],
+      "id": "641a7956-8a60-464d-9741-2a8a798b6039",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yW3qIuEycEdH1mcz",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "06f5e1b0-55f1-4ae8-ae28-1fea3a28c9af",
+              "leftValue": "={{ $json.existingRowData.feu_vert }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3376,
+        -1024
+      ],
+      "id": "1bcd75f8-138a-42a7-bab5-fe228b9fb85f",
+      "name": "If-feu_vert vide"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.RA }}",
+        "subject": "=Nouveau document reçu — client déjà validé — {{ JSON.parse($('AI Agent-Extraction Client').item.json.output).nom_societe }}",
+        "message": "=<p>Bonjour,</p>\n\n<p>Un nouvel email a été reçu pour un client <strong>déjà validé</strong>.</p>\n\n<p>\n<strong>Société :</strong>{{ JSON.parse($('AI Agent-Extraction Client').item.json.output).nom_societe }}<br>\n<strong>Email client :</strong> {{ $('Js detecter doublon').first().json.email_client }}<br>\n<strong>Statut feu_vert :</strong> Oui\n</p>\n\n<p>Aucune modification n'a été apportée au dossier existant. Merci de traiter manuellement si nécessaire.</p>\n\n<p>Cordialement,<br>Système automatique Colead Finance</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3744,
+        -896
+      ],
+      "id": "3a069db6-44e6-44a7-9752-8d43995d0cc3",
+      "name": "Send a message1",
+      "webhookId": "b7a65584-5bc2-46b0-959c-02cfd151784a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "WVafeGatVigO9G7A",
+          "name": "Gmail account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1fb045fd-206e-44c4-8372-b8f71e20f83a",
+              "leftValue": "={{ $json.differences }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3200,
+        -960
+      ],
+      "id": "5b6c9292-0e45-418c-b752-833c3f98df5b",
+      "name": "difference "
+    },
+    {
+      "parameters": {
+        "content": "SI ajout fichier --> impssible trouve feu vert oui , car si c est le cas --> suppression du fichier temporaire"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3120,
+        -672
+      ],
+      "typeVersion": 1,
+      "id": "ca7c5607-e7ef-40c2-b3db-3582c497886c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Node: JS-Décoder pour Hash\n// À insérer entre \"HTTP-Télécharger Binaire Gmail\" et \"Crypto-Hash MD5 Fichier\"\n// Décode le base64 Gmail en vrai binaire PDF, pour que le MD5 corresponde à celui de Drive\n\nconst items = $input.all();\nconst results = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const buffer = await this.helpers.getBinaryDataBuffer(i, 'data');\n  const gmailResponse = JSON.parse(buffer.toString('utf-8'));\n\n  const base64Standard = gmailResponse.data.replace(/-/g, '+').replace(/_/g, '/');\n  const pdfBuffer = Buffer.from(base64Standard, 'base64');\n\n  results.push({\n    json: { ...items[i].json },\n    binary: {\n      data: await this.helpers.prepareBinaryData(\n        pdfBuffer,\n        items[i].json.filename || 'document.pdf',\n        items[i].json.mimeType || 'application/pdf'\n      )\n    }\n  });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1392,
+        -560
+      ],
+      "id": "141427c1-69c5-4f15-b391-5b20360d47c4",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ JSON.parse($('AI Agent-Extraction Client').item.json.output).nom_societe }} - À valider",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4304,
+        -400
+      ],
+      "id": "074304ce-bdb3-42b7-b511-6b0e4d768a46",
+      "name": "Rechercher Dossier Drive2",
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "T9mgdxC1uhFV5HN6",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "=sheet {{ JSON.parse($('AI Agent-Extraction Client').item.json.output).nom_societe }} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4576,
+        -384
+      ],
+      "id": "7354cd67-6b1e-4dd3-8636-e42c1b5d8859",
+      "name": "Create spreadsheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yW3qIuEycEdH1mcz",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Rechercher Dossier Drive2').item.json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4784,
+        -384
+      ],
+      "id": "83187a96-3a8d-4b84-9aab-4a535e5ef9e8",
+      "name": "Move file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "T9mgdxC1uhFV5HN6",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  date: new Date().toISOString().split('T')[0],\n  ThreadID: $('Get a thread').first().json.id\n  \n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4992,
+        -384
+      ],
+      "id": "244c9ef6-aa8c-4380-ab0a-bee5914b05b9",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Move file').item.json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Feuille 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UJJlQkmGCkKUZTAI_BRjbFFwY8NW_wEfIcrfkcFQJAk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ThreadID",
+              "displayName": "ThreadID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        5216,
+        -384
+      ],
+      "id": "24b5b342-c059-41fc-85b9-fc30f0d6add0",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yW3qIuEycEdH1mcz",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ─────────────────────────────────────────────\n// JS - Détecteur Doublon\n// ─────────────────────────────────────────────\nconst rawOutput = $('AI Agent-Extraction Client').first().json.output;\nlet cleanOutput = rawOutput;\nif (typeof rawOutput === 'string') {\n  cleanOutput = rawOutput.replace(/```json\\s*|```/g, '').trim();\n}\nconst newItem = typeof cleanOutput === 'string' ? JSON.parse(cleanOutput) : cleanOutput;\n\nconst INVALID_VALUES = ['Erreur', 'Non renseigné', ''];\n\nconst existingClients = $('Lire Clients Sheet').all();\nlet matchedRow = null;\nlet matchReason = null;\nfor (const client of existingClients) {\n  const row = client.json;\n  if (row.siret && newItem.siret &&\n      !INVALID_VALUES.includes(row.siret) && !INVALID_VALUES.includes(newItem.siret) &&\n      String(row.siret).trim() === String(newItem.siret).trim()) {\n    matchedRow = client;\n    matchReason = 'siret';\n    break;\n  }\n  if (row.email_client && newItem.email_client &&\n      !INVALID_VALUES.includes(row.email_client) && !INVALID_VALUES.includes(newItem.email_client) &&\n      row.email_client.toLowerCase().trim() === newItem.email_client.toLowerCase().trim()) {\n    matchedRow = client;\n    matchReason = 'email_client';\n    break;\n  }\n  if (row.nom_société && newItem.nom_societe &&\n      row.nom_société.toLowerCase().trim() === newItem.nom_societe.toLowerCase().trim()) {\n    matchedRow = client;\n    matchReason = 'nom_société';\n    break;\n  }\n}\n\nconst fieldsToCompare = ['nom_société', 'email_client', 'siret', 'parcours', 'paie', 'juridique'];\nconst differences = [];\nconst finalItem = { ...newItem };\n\nif (matchedRow) {\n  const oldData = matchedRow.json;\n  for (const field of fieldsToCompare) {\n    const oldVal = String(oldData[field] ?? '').trim();\n    const newFieldKey = field === 'nom_société' ? 'nom_societe' : field;\n    const newVal = String(newItem[newFieldKey] ?? '').trim();\n\n    if (oldVal === 'Erreur' && newVal !== '' && newVal !== 'undefined' && newVal !== 'Erreur') {\n      differences.push({ field, ancien: oldVal, nouveau: newVal, raison: 'correction_erreur' });\n      continue;\n    }\n    if (newVal === 'Erreur' && oldVal !== '' && oldVal !== 'Erreur') {\n      finalItem[newFieldKey] = oldVal;\n      continue;\n    }\n    if (oldVal !== newVal && newVal !== '' && newVal !== 'undefined') {\n      differences.push({ field, ancien: oldVal, nouveau: newVal });\n    }\n  }\n}\n\nreturn [{\n  json: {\n    ...finalItem,\n    isDuplicate: !!matchedRow,\n    matchReason: matchReason,\n    existingRowNumber: matchedRow ? matchedRow.json.row_number : null,\n    existingRowData: matchedRow ? matchedRow.json : null,\n    differences: differences\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2752,
+        -560
+      ],
+      "id": "1ed76b81-5304-4ac3-ae53-820a15551c59",
+      "name": "Js detecter doublon"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Search files and folders1').item.json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Feuille 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1k-EI80IrTdxu2bUEr4ovoU7iMOZbyHo175lZVwxs9uU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ $json.date }}",
+            "ThreadID": "={{ $json.ThreadID }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ThreadID",
+              "displayName": "ThreadID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4800,
+        -1024
+      ],
+      "id": "6fa2cd9b-37d3-44fc-ae92-bf65348c81fe",
+      "name": "Append row in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yW3qIuEycEdH1mcz",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "=sheet {{ $('Js detecter doublon').item.json.nom_societe }}",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4352,
+        -1008
+      ],
+      "id": "ca36cede-dcbc-4b20-9133-a3b50c845e41",
+      "name": "Search files and folders1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "T9mgdxC1uhFV5HN6",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        320,
+        -256
+      ],
+      "id": "dce74ed2-55a7-4448-8ede-cd8724d983e1",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "7iml1KzB6lFxBJbv",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  json: {\n    date: new Date().toISOString().split('T')[0],\n    ThreadID:$('Get a thread').first().json.id// adapte selon le nom exact du champ dans ton item d'entrée\n  }\n};\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4560,
+        -1008
+      ],
+      "id": "86862f44-c172-4299-ba7c-50399cafe98c",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/drive/v3/files?q='{{ $('Rechercher Dossier Drive3').first().json.id }}' in parents&fields=files(name)",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3648,
+        -400
+      ],
+      "id": "e9889240-cb1f-422c-aadf-7d0e4d9a5eae",
+      "name": "HTTP Request2",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "T9mgdxC1uhFV5HN6",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ JSON.parse($('AI Agent-Extraction Client').item.json.output.replace(/```json|```/g, '').trim()).nom_societe }} - À valider",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3488,
+        -400
+      ],
+      "id": "18e4f822-9c2d-4694-8f99-ffeefad65b7d",
+      "name": "Rechercher Dossier Drive3",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "T9mgdxC1uhFV5HN6",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        -288
+      ],
+      "id": "ee133c51-3747-4c4d-a1f8-9b8dd93eb8fe",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "KQRU9BiTah1xEl4A",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        2288,
+        -320
+      ],
+      "id": "9ee07d11-97a2-4dd8-b735-01915926cdfe",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "KQRU9BiTah1xEl4A",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1GZqu_E1VfciK-GDCxveHyYujTEE1EL5-y9Q0FJ5g518",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "0",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3856,
+        -400
+      ],
+      "id": "2df29ee1-aa84-4f5d-94a0-65aeca3f5d00",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yW3qIuEycEdH1mcz",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1GZqu_E1VfciK-GDCxveHyYujTEE1EL5-y9Q0FJ5g518",
+          "mode": "list",
+          "cachedResultName": "RA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GZqu_E1VfciK-GDCxveHyYujTEE1EL5-y9Q0FJ5g518/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Feuille 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GZqu_E1VfciK-GDCxveHyYujTEE1EL5-y9Q0FJ5g518/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3568,
+        -912
+      ],
+      "id": "d71604cc-afcb-40a4-9d06-a26a2dd53d7b",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yW3qIuEycEdH1mcz",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Get many messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a thread": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain-Filtre Accord Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages": {
+      "main": [
+        [
+          {
+            "node": "Get a thread",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain-Filtre Accord Client": {
+      "main": [
+        [
+          {
+            "node": "If-Accord Donné",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If-Accord Donné": {
+      "main": [
+        [
+          {
+            "node": "JS-Extraire Pièces Jointes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS-Extraire Pièces Jointes": {
+      "main": [
+        [
+          {
+            "node": "Call 'traitementPJ'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto-Hash MD5 Fichier": {
+      "main": [
+        [
+          {
+            "node": "JS-Dédupliquer ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS-Dédupliquer ": {
+      "main": [
+        [
+          {
+            "node": "If- Fichiers Valides",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If- Fichiers Valides": {
+      "main": [
+        [
+          {
+            "node": "JS-Préparer Données Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS-Préparer Données Agent": {
+      "main": [
+        [
+          {
+            "node": "AI Agent-Extraction Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent-Extraction Client": {
+      "main": [
+        [
+          {
+            "node": "Lire Clients Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Rechercher Dossier Drive2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Créer Dossier et Uploader PDF": {
+      "main": [
+        [
+          {
+            "node": "Rechercher Dossier Drive3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'traitementPJ'": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lire Clients Sheet": {
+      "main": [
+        [
+          {
+            "node": "Js detecter doublon",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If-Doublon Trouvé": {
+      "main": [
+        [
+          {
+            "node": "difference ",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Rechercher Dossier Drive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Call Créer Dossier et Uploader PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Créer Dossier et Uploader PDF1": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rechercher Dossier Drive": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "JS-Filtrer Nouveaux Fichiers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Call Créer Dossier et Uploader PDF1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search files and folders1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS-Filtrer Nouveaux Fichiers": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS-Fusionner Champs": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If-feu_vert vide": {
+      "main": [
+        [
+          {
+            "node": "JS-Fusionner Champs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search files and folders1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "difference ": {
+      "main": [
+        [
+          {
+            "node": "If-feu_vert vide",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search files and folders1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Crypto-Hash MD5 Fichier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rechercher Dossier Drive2": {
+      "main": [
+        [
+          {
+            "node": "Create spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Move file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move file": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Js detecter doublon": {
+      "main": [
+        [
+          {
+            "node": "If-Doublon Trouvé",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rechercher Dossier Drive3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain-Filtre Accord Client",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent-Extraction Client",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "b26e14c5-3175-40d0-9937-85973f405d96",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "995d08d1a91a65414360eea25ea5ded11608110e1547365adc6effc9af7ac614"
+  },
+  "id": "lztUvZWefyeNOvDD",
+  "tags": []
+}

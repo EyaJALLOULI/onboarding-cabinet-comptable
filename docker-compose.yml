@@ -1,0 +1,14 @@
+services:
+  ocr:
+    build:
+      context: ./ocr
+    ports:
+      - "9001:9001"
+    restart: unless-stopped
+
+  clamav:
+    build:
+      context: ./clamav
+    ports:
+      - "9000:9000"
+    restart: unless-stopped
