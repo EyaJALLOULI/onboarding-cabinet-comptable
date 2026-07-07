@@ -1,4 +1,22 @@
+name: onboarding-cabinet
+
 services:
+  n8n:
+    image: n8nio/n8n:2.29.3
+    restart: always
+    ports:
+      - "5678:5678"
+    env_file:
+      - .env
+    environment:
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
+    volumes:
+      - ./n8n/data:/home/node/.n8n
+      - ./n8n/backup:/backup
+      - ./n8n/files:/files
+    depends_on:
+      - clamav
+      - ocr
   ocr:
     build:
       context: ./ocr
