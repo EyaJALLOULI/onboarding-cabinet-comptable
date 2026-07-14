@@ -1,0 +1,493 @@
+{
+  "name": "api_sirene",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://api.insee.fr/api-sirene/3.11/siret/{{ $json.siret }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-INSEE-Api-Key-Integration",
+              "value": "81663ecd-b8b0-439f-bb5b-3deddcbb3809"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -560,
+        1088
+      ],
+      "id": "c5b89d39-2541-427f-9658-257f5bb51cff",
+      "name": "Get Etablissement Sirene"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8",
+          "mode": "list",
+          "cachedResultName": "Clients",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 860566660,
+          "mode": "list",
+          "cachedResultName": "API Sirene",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8/edit#gid=860566660"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "siren": "={{ $json.siren }}",
+            "siret ": "={{ $json.siret }}",
+            "dateCreationUniteLegale": "={{ $json.dateCreationUniteLegale }}",
+            "dateCreationEtablissement": "={{ $json.dateCreationEtablissement }}",
+            "categorieJuridiqueUniteLegale": "={{ $json.categorieJuridiqueUniteLegale }}",
+            "nombrePeriodesUniteLegale": "={{ $json.nombrePeriodesUniteLegale }}",
+            "denominationUniteLegale": "={{ $json.denominationUniteLegale }}",
+            "sigleUniteLegale": "={{ $json.sigleUniteLegale }}",
+            "denominationUsuelle1UniteLegale": "={{ $json.denominationUsuelle1UniteLegale }}",
+            "etatAdministratifUniteLegale": "={{ $json.etatAdministratifUniteLegale }}",
+            "categorieEntreprise": "={{ $json.categorieEntreprise }}",
+            "economieSocialeSolidaireUniteLegale": "={{ $json.economieSocialeSolidaireUniteLegale }}",
+            "societeMissionUniteLegale": "={{ $json.societeMissionUniteLegale }}",
+            "complementAdresseEtablissement": "={{ $json.complementAdresseEtablissement }}",
+            "numeroVoieEtablissement": "={{ $json.numeroVoieEtablissement }}",
+            "typeVoieEtablissement": "={{ $json.typeVoieEtablissement }}",
+            "libelleVoieEtablissement": "={{ $json.libelleVoieEtablissement }}",
+            "codePostalEtablissement": "={{ $json.codePostalEtablissement }}",
+            "libelleCommuneEtablissement": "={{ $json.libelleCommuneEtablissement }}",
+            "codeCommuneEtablissement": "={{ $json.codeCommuneEtablissement }}",
+            "activitePrincipaleUniteLegale": "={{ $json.activitePrincipaleUniteLegale }}",
+            "activitePrincipaleEtablissement": "={{ $json.activitePrincipaleEtablissement }}",
+            "nomenclatureActiviteUniteLegale": "={{ $json.nomenclatureActiviteUniteLegale }}",
+            "activitePrincipaleRegistreMetiersEtablissement": "={{ $json.activitePrincipaleRegistreMetiersEtablissement }}",
+            "trancheEffectifsUniteLegale": "={{ $json.trancheEffectifsUniteLegale }}",
+            "anneeEffectifsUniteLegale": "={{ $json.anneeEffectifsUniteLegale }}",
+            "trancheEffectifsEtablissement": "={{ $json.trancheEffectifsEtablissement }}",
+            "etablissementSiege": "={{ $json.etablissementSiege }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "siren",
+              "displayName": "siren",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "siret ",
+              "displayName": "siret ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "denominationUniteLegale",
+              "displayName": "denominationUniteLegale",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sigleUniteLegale",
+              "displayName": "sigleUniteLegale",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "denominationUsuelle1UniteLegale",
+              "displayName": "denominationUsuelle1UniteLegale",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "dateCreationUniteLegale",
+              "displayName": "dateCreationUniteLegale",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "dateCreationEtablissement",
+              "displayName": "dateCreationEtablissement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "categorieJuridiqueUniteLegale",
+              "displayName": "categorieJuridiqueUniteLegale",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "etatAdministratifUniteLegale",
+              "displayName": "etatAdministratifUniteLegale",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "categorieEntreprise",
+              "displayName": "categorieEntreprise",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "economieSocialeSolidaireUniteLegale",
+              "displayName": "economieSocialeSolidaireUniteLegale",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "societeMissionUniteLegale",
+              "displayName": "societeMissionUniteLegale",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "complementAdresseEtablissement",
+              "displayName": "complementAdresseEtablissement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "numeroVoieEtablissement",
+              "displayName": "numeroVoieEtablissement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "typeVoieEtablissement",
+              "displayName": "typeVoieEtablissement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "libelleVoieEtablissement",
+              "displayName": "libelleVoieEtablissement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "codePostalEtablissement",
+              "displayName": "codePostalEtablissement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "libelleCommuneEtablissement",
+              "displayName": "libelleCommuneEtablissement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "codeCommuneEtablissement",
+              "displayName": "codeCommuneEtablissement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "activitePrincipaleUniteLegale",
+              "displayName": "activitePrincipaleUniteLegale",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "activitePrincipaleEtablissement",
+              "displayName": "activitePrincipaleEtablissement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "nomenclatureActiviteUniteLegale",
+              "displayName": "nomenclatureActiviteUniteLegale",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "activitePrincipaleRegistreMetiersEtablissement",
+              "displayName": "activitePrincipaleRegistreMetiersEtablissement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "trancheEffectifsUniteLegale",
+              "displayName": "trancheEffectifsUniteLegale",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "anneeEffectifsUniteLegale",
+              "displayName": "anneeEffectifsUniteLegale",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "trancheEffectifsEtablissement",
+              "displayName": "trancheEffectifsEtablissement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "etablissementSiege",
+              "displayName": "etablissementSiege",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "nombrePeriodesUniteLegale",
+              "displayName": "nombrePeriodesUniteLegale",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "locationDefine": {
+            "values": {
+              "headerRow": 2
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -160,
+        1088
+      ],
+      "id": "68f40bcf-d248-4c62-bea6-6cec512c379b",
+      "name": "Append row in sheet3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "elK5R6515RvJ26Xl",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// Nœud \"Code\" n8n — Mode \"Run Once for All Items\"\n// Extraction + décodage des champs API Sirene\n// Format des champs codés : \"Libellé (valeur initiale)\"\n// ============================================================\n\n// ---- Tables de correspondance ----\nconst TRANCHE_EFFECTIFS = {\n  \"NN\": \"Unité non employeuse\",\n  \"00\": \"0 salarié\",\n  \"01\": \"1 à 2 salariés\",\n  \"02\": \"3 à 5 salariés\",\n  \"03\": \"6 à 9 salariés\",\n  \"11\": \"10 à 19 salariés\",\n  \"12\": \"20 à 49 salariés\",\n  \"21\": \"50 à 99 salariés\",\n  \"22\": \"100 à 199 salariés\",\n  \"31\": \"200 à 249 salariés\",\n  \"32\": \"250 à 499 salariés\",\n  \"41\": \"500 à 999 salariés\",\n  \"42\": \"1 000 à 1 999 salariés\",\n  \"51\": \"2 000 à 4 999 salariés\",\n  \"52\": \"5 000 à 9 999 salariés\",\n  \"53\": \"10 000 salariés et plus\",\n};\n\nconst ETAT_ADMINISTRATIF_UL = { \"A\": \"Active\", \"C\": \"Cessée\" };\nconst ETAT_ADMINISTRATIF_ETAB = { \"A\": \"Actif\", \"F\": \"Fermé\" };\nconst OUI_NON = { \"O\": \"Oui\", \"N\": \"Non\" };\nconst CATEGORIE_ENTREPRISE = {\n  \"PME\": \"Petite ou Moyenne Entreprise\",\n  \"ETI\": \"Entreprise de Taille Intermédiaire\",\n  \"GE\": \"Grande Entreprise\",\n};\n\nconst CATEGORIE_JURIDIQUE = {\n  \"1000\": \"Entrepreneur individuel\",\n  \"5202\": \"Société en nom collectif\",\n  \"5306\": \"Société en commandite simple\",\n  \"5307\": \"Société en commandite par actions\",\n  \"5485\": \"Société d'exercice libéral à responsabilité limitée\",\n  \"5498\": \"SARL unipersonnelle (EURL)\",\n  \"5499\": \"Société à responsabilité limitée (SARL)\",\n  \"5599\": \"Société anonyme (SA)\",\n  \"5605\": \"SAS à associé unique (SASU)\",\n  \"5710\": \"Société par actions simplifiée (SAS)\",\n  \"5720\": \"Société européenne\",\n  \"6540\": \"Association loi 1901\",\n  \"6533\": \"Fondation\",\n  \"7111\": \"Établissement public national à caractère administratif\",\n  \"7220\": \"Commune et commune nouvelle\",\n  \"9220\": \"Autre personne morale de droit étranger\",\n};\n\nconst TYPE_VOIE = {\n  \"ALL\": \"Allée\", \"AV\": \"Avenue\", \"BD\": \"Boulevard\", \"CAR\": \"Carrefour\",\n  \"CHE\": \"Chemin\", \"CHS\": \"Chaussée\", \"CITE\": \"Cité\", \"COR\": \"Corniche\",\n  \"CRS\": \"Cours\", \"DOM\": \"Domaine\", \"DSC\": \"Descente\", \"ECA\": \"Écart\",\n  \"ESP\": \"Esplanade\", \"FG\": \"Faubourg\", \"GR\": \"Grande Rue\", \"HAM\": \"Hameau\",\n  \"HLE\": \"Halle\", \"IMP\": \"Impasse\", \"LD\": \"Lieu-dit\", \"LOT\": \"Lotissement\",\n  \"MAR\": \"Marché\", \"MTE\": \"Montée\", \"PAS\": \"Passage\", \"PL\": \"Place\",\n  \"PLN\": \"Plaine\", \"PLT\": \"Plateau\", \"PRO\": \"Promenade\", \"PRV\": \"Parvis\",\n  \"QUA\": \"Quartier\", \"QUAI\": \"Quai\", \"RES\": \"Résidence\", \"RLE\": \"Ruelle\",\n  \"ROC\": \"Rocade\", \"RPT\": \"Rond-point\", \"RTE\": \"Route\", \"RUE\": \"Rue\",\n  \"SEN\": \"Sentier\", \"SQ\": \"Square\", \"TOUR\": \"Tour\", \"TPL\": \"Terre-plein\",\n  \"TRA\": \"Traverse\", \"VLA\": \"Villa\", \"VLGE\": \"Village\",\n};\n\nconst NAF_EXEMPLES = {\n  \"62.01Z\": \"Programmation informatique\",\n  \"62.02A\": \"Conseil en systèmes et logiciels informatiques\",\n  \"62.20G\": \"Autre activité de service auprès des entreprises (conseil en informatique)\",\n  \"70.10Z\": \"Activités des sièges sociaux\",\n  \"70.22Z\": \"Conseil pour les affaires et autres conseils de gestion\",\n  \"68.20A\": \"Location de logements\",\n  \"47.11F\": \"Hypermarchés\",\n  \"56.10A\": \"Restauration traditionnelle\",\n  \"00.00Z\": \"Activité non encore déterminée\",\n};\n\n// ---- Helpers ----\n// \"Libellé (valeur initiale)\" ; null si la valeur est absente\nfunction dec(table, code, fallback) {\n  if (code === null || code === undefined || code === \"\") return null;\n  const label = table[code] || (fallback || \"Code inconnu\");\n  return `${label} (${code})`;\n}\n\nfunction decBool(value, labelTrue, labelFalse) {\n  if (value === true || value === \"true\") return `${labelTrue} (${value})`;\n  if (value === false || value === \"false\") return `${labelFalse} (${value})`;\n  return null;\n}\n\n// ============================================================\n// PARTIE N8N\n// ============================================================\nconst items = $input.all();\nconst output = [];\n\nfor (const item of items) {\n  const data = item.json;\n  const list = Array.isArray(data) ? data : [data];\n\n  for (const entry of list) {\n    const etab = entry.etablissement || {};\n    const ul = etab.uniteLegale || {};\n    const adr = etab.adresseEtablissement || {};\n    const periodes = etab.periodesEtablissement || [];\n    const periode = periodes.find(p => p.dateFin === null) || periodes[0] || {};\n\n    output.push({\n      json: {\n        // ---- identification_entreprise ----\n        siren: etab.siren ?? null,\n        siret: etab.siret ?? null,\n        denominationUniteLegale: ul.denominationUniteLegale ?? null,\n        sigleUniteLegale: ul.sigleUniteLegale ?? null,\n        denominationUsuelle1UniteLegale: ul.denominationUsuelle1UniteLegale ?? null,\n        dateCreationUniteLegale: ul.dateCreationUniteLegale ?? null,\n        dateCreationEtablissement: etab.dateCreationEtablissement ?? null,\n\n        // ---- informations_juridiques (décodés) ----\n        categorieJuridiqueUniteLegale: dec(CATEGORIE_JURIDIQUE, ul.categorieJuridiqueUniteLegale, \"Code non répertorié\"),\n        etatAdministratifUniteLegale: dec(ETAT_ADMINISTRATIF_UL, ul.etatAdministratifUniteLegale),\n        etatAdministratifEtablissement: dec(ETAT_ADMINISTRATIF_ETAB, periode.etatAdministratifEtablissement),\n        categorieEntreprise: dec(CATEGORIE_ENTREPRISE, ul.categorieEntreprise),\n        economieSocialeSolidaireUniteLegale: dec(OUI_NON, ul.economieSocialeSolidaireUniteLegale),\n        societeMissionUniteLegale: dec(OUI_NON, ul.societeMissionUniteLegale),\n\n        // ---- adresse_etablissement ----\n        complementAdresseEtablissement: adr.complementAdresseEtablissement ?? null,\n        numeroVoieEtablissement: adr.numeroVoieEtablissement ?? null,\n        typeVoieEtablissement: dec(TYPE_VOIE, adr.typeVoieEtablissement, \"Abréviation non répertoriée\"),\n        libelleVoieEtablissement: adr.libelleVoieEtablissement ?? null,\n        codePostalEtablissement: adr.codePostalEtablissement ?? null,\n        libelleCommuneEtablissement: adr.libelleCommuneEtablissement ?? null,\n        codeCommuneEtablissement: adr.codeCommuneEtablissement ?? null,\n\n        // ---- activite_et_risque_comptable (NAF décodés) ----\n        activitePrincipaleUniteLegale: dec(NAF_EXEMPLES, ul.activitePrincipaleUniteLegale, \"Code NAF\"),\n        activitePrincipaleEtablissement: dec(NAF_EXEMPLES, periode.activitePrincipaleEtablissement, \"Code NAF\"),\n        nomenclatureActiviteUniteLegale: ul.nomenclatureActivitePrincipaleUniteLegale ?? null,\n        activitePrincipaleRegistreMetiersEtablissement: etab.activitePrincipaleRegistreMetiersEtablissement ?? null,\n\n        // ---- taille_et_complexite_du_client (décodés) ----\n        trancheEffectifsUniteLegale: dec(TRANCHE_EFFECTIFS, ul.trancheEffectifsUniteLegale),\n        anneeEffectifsUniteLegale: ul.anneeEffectifsUniteLegale ?? null,\n        trancheEffectifsEtablissement: dec(TRANCHE_EFFECTIFS, etab.trancheEffectifsEtablissement),\n        etablissementSiege: decBool(etab.etablissementSiege, \"Siège social\", \"Établissement secondaire\"),\n        nombrePeriodesUniteLegale: etab.nombrePeriodesEtablissement ?? null, // NB: l'API ne fournit que nombrePeriodesEtablissement\n      },\n    });\n  }\n}\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        1088
+      ],
+      "id": "01356047-5282-4658-92ae-163905f8d57f",
+      "name": "js decode api sirene"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "siret"
+            }
+          ]
+        }
+      },
+      "id": "076da470-4993-48de-9ee8-8b06cb5e9175",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -768,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "content": "correction siret dynamique",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -576,
+        1008
+      ],
+      "typeVersion": 1,
+      "id": "5694ab55-1678-4df6-93f8-79d4e0b40f97",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get Etablissement Sirene": {
+      "main": [
+        [
+          {
+            "node": "js decode api sirene",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "js decode api sirene": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Get Etablissement Sirene",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "3d7aec82-922e-4f91-948d-02fb0d758b95",
+  "meta": {
+    "instanceId": "276b75ddf92a47b01772b58ed8bd2e37f8a10b5a9f518021c98717c626acb239"
+  },
+  "nodeGroups": [],
+  "id": "Lkeu6inGs1hNUpon",
+  "tags": []
+}

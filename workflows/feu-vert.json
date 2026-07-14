@@ -1,0 +1,672 @@
+{
+  "name": "feu-vert",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Feuille 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8/edit#gid=0"
+        },
+        "event": "rowUpdate",
+        "options": {
+          "columnsToWatch": [
+            "feu_vert"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1904,
+        80
+      ],
+      "id": "b1ada53f-0aff-42f3-bbb4-8852c14f79fc",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "mf0WVEtSiuwzT6dz",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "998f3ee3-6b09-4745-afd0-5e4429572f04",
+              "leftValue": "={{ $json.feu_vert }}",
+              "rightValue": "Oui",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1728,
+        80
+      ],
+      "id": "af9a33b9-2574-4185-8533-7bc6d0e50968",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $json['nom_société'] }} - {{ $json.siret }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1vcWgzYr1uuPztBRKUOcCp5mWS5CR-TiN",
+          "mode": "list",
+          "cachedResultName": "Clients",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1vcWgzYr1uuPztBRKUOcCp5mWS5CR-TiN"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1488,
+        64
+      ],
+      "id": "0b700353-1d2b-40ae-854e-ac7a44596c53",
+      "name": "Create folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=00_ONBOARDING",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create folder').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1312,
+        64
+      ],
+      "id": "86bd5c60-9592-4be6-92f1-f2964c57e411",
+      "name": "Create folder1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=01_JURIDIQUE",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create folder').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1152,
+        64
+      ],
+      "id": "73a36e23-264e-498a-9568-12220fca8fb0",
+      "name": "Create folder2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=02_COMPTABILITE",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create folder').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -976,
+        64
+      ],
+      "id": "068ba650-8506-4e46-9b0a-8e28f6193479",
+      "name": "Create folder3",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=04_FISCAL",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create folder').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -848,
+        64
+      ],
+      "id": "bf0bf40a-eca9-4da3-8669-93aedbb44944",
+      "name": "Create folder4",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=05_LM",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create folder').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -720,
+        64
+      ],
+      "id": "f6a87f65-92d8-460a-ba19-c524eedf9653",
+      "name": "Create folder5",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=03_SOCIAL",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create folder').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -448,
+        -48
+      ],
+      "id": "335ddfe0-03c0-468a-8532-ddd2e631ef8a",
+      "name": "Create folder6",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6fc8140b-2f26-4888-8275-ee3e72355433",
+              "leftValue": "={{ $('Google Sheets Trigger').item.json.paie.toString() }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -592,
+        64
+      ],
+      "id": "d2e78bbb-6d94-4cd1-bb34-354dc9016a9b",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $('Google Sheets Trigger').item.json['nom_société'] }} - À valider",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -256,
+        80
+      ],
+      "id": "60985ecd-edee-4d54-bcda-effc3b0c83ec",
+      "name": "Rechercher Dossier Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tu es chargé de classer des fichiers dans la bonne sous-catégorie de son dossier Drive, selon son nom de fichier.\n\nCatégories disponibles :\n- 00_ONBOARDING : documents de suivi, checklists, échanges avec le client \n  pendant la phase d'accueil\n- 01_JURIDIQUE : statuts de la société, extraits Kbis, registre des \n  bénéficiaires effectifs, accords d'actionnaires, procès-verbaux\n- 02_COMPTABILITE : FEC (Fichier des Écritures Comptables), balances, \n  liasses fiscales\n- 03_SOCIAL : UNIQUEMENT si le client a des salariés (paie) — contrats \n  de travail, DSN, bulletins de paie\n- 04_FISCAL : déclarations fiscales, échéances\n- 05_LM : lettre de mission signée par le client\n\nDonnées du fichier à classer :\n- Nom du fichier : {{ $json.name }}\n- ID du fichier : {{ $json.id }}\n- ID du dossier actuel du fichier : {{ $('Rechercher Dossier Drive1').item.json.id }}\n- Ce client a-t-il des salariés (paie) : {{ $('Google Sheets Trigger').item.json.paie === 'Oui' ? 'Oui' : 'Non' }}\n\nTable de correspondance catégorie → ID du dossier de destination \n(utilise EXCLUSIVEMENT ces ID, jamais le nom de la catégorie) :\n- 00_ONBOARDING → {{ $('Create folder1').item.json.id }}\n- 01_JURIDIQUE → {{ $('Create folder2').item.json.id }}\n- 02_COMPTABILITE → {{ $('Create folder3').item.json.id }}\n- 03_SOCIAL → {{ $if($('Create folder6').isExecuted, $('Create folder6').item.json.id, '') }} (utilisable UNIQUEMENT si \"Ce client a-t-il des salariés\" = Oui ci-dessus ; si vide, ne jamais choisir cette catégorie)\n- 04_FISCAL → {{ $('Create folder4').item.json.id }}\n- 05_LM → {{ $('Create folder5').item.json.id }}\n\n---\n\n⚠️ INSTRUCTIONS STRICTES — À RESPECTER SANS EXCEPTION :\n- Ne jamais interpréter, deviner ou déduire une catégorie en dehors \n  des mots-clés listés dans les règles ci-dessous.\n- Ne jamais raisonner sur le \"sens\", la \"nature\" ou le \"contexte\" \n  du nom du fichier pour contourner les règles.\n- Ne jamais traduire le nom du fichier (ex : \"shareholder\" ne doit \n  PAS être traduit en \"actionnaires\" pour matcher un mot-clé).\n- Si aucun mot-clé exact des règles 1 à 7 n'est trouvé dans le nom \n  du fichier, applique la règle 8 sans exception.\n- Ne jamais te contredire : choisis une seule catégorie, cite une \n  seule règle, pas de correction ni de note après coup.\n- La recherche de mots-clés est insensible à la casse \n  (majuscules/minuscules sont ignorées).\n\n---\n\nRÈGLES DE DÉCISION — Analyse le nom du fichier. Applique les règles \ndans l'ordre ci-dessous. Dès qu'un mot-clé correspond, utilise cette \ncatégorie et ARRÊTE. N'applique le défaut (règle 8) que si AUCUN \nmot-clé des règles 1 à 7 n'a été trouvé dans le nom du fichier.\n\nRègle 1 — PRIORITAIRE : Si le nom contient \"kbis\", \"k-bis\" ou \n\"registre_titres\" → 01_JURIDIQUE. \nTOUJOURS, sans aucune exception.\n\nRègle 2 : Si le nom contient \"statuts\", \"bénéficiaire\", \n\"immatriculation\", \"actionnaires\", \"accord_actionnaires\", \n\"pacte_associes\", \"pv_ag\", \"proces_verbal\" ou \"cession\" \n→ 01_JURIDIQUE.\n\nRègle 3 : Si le nom contient \"fec\", \"balance\", \"liasse\", \n\"grand_livre\" ou \"journal\" → 02_COMPTABILITE.\n\nRègle 4 : Si le nom contient \"contrat_travail\", \"dsn\", \n\"bulletin_paie\" ou \"salarié\" :\n  - ET \"Ce client a-t-il des salariés\" = Oui → 03_SOCIAL\n  - ET \"Ce client a-t-il des salariés\" = Non → 00_ONBOARDING \n    (ne jamais utiliser 03_SOCIAL dans ce cas)\n\nRègle 5 : Si le nom contient \"tva\", \"is\", \"cfe\", \"liasse_fiscale\", \n\"echeance\" ou \"declaration\" → 04_FISCAL.\n\nRègle 6 : Si le nom contient \"lettre_mission\", \"lm_signee\" ou \n\"mandat\" → 05_LM.\n\nRègle 7 : Si le nom contient \"onboarding\" ou \"checklist\" \n→ 00_ONBOARDING.\n\nRègle 8 — DÉFAUT (uniquement si aucune des règles 1 à 7 ne \ncorrespond) : → 00_ONBOARDING.\n\n⚠️ RAPPEL CRITIQUE : Ne jamais appliquer la règle 8 si un mot-clé \ndes règles 1 à 7 a été identifié dans le nom du fichier. La règle 8 \nn'existe que pour les fichiers dont le nom ne contient strictement \naucun mot-clé reconnu.\n\n---\n\nInstruction finale :\nUne fois la catégorie déterminée, appelle l'outil \"DeplacerFichier\" \navec :\n- fileId = l'ID du fichier donné ci-dessus (jamais le nom du fichier)\n- parentFolder = l'ID Drive correspondant à la catégorie choisie, \n  trouvé dans la table de correspondance ci-dessus (jamais le nom \n  de la catégorie comme \"01_JURIDIQUE\")\n\nNe réponds jamais sans avoir appelé cet outil.\n\nFormat de réponse (une seule ligne, pas de note ni de correction) :\n\"Le fichier [nom du fichier] a été classé dans [nom de la catégorie] \n(mot-clé détecté : [mot-clé trouvé] — règle [numéro]).\"",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        128,
+        64
+      ],
+      "id": "de9c33f9-eb40-4a9f-9db6-9d7b3d732d32",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "=",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -80,
+        64
+      ],
+      "id": "9a0d8f2e-d901-4cf6-b79a-f90d89a1a840",
+      "name": "Search files and folders",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File', ``, 'string') }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Parent_Folder', ``, 'string') }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        288,
+        240
+      ],
+      "id": "8b408934-fec4-4d40-a69e-055285979235",
+      "name": "Move file in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "deleteFolder",
+        "folderNoRootId": {
+          "__rl": true,
+          "value": "={{ $('Rechercher Dossier Drive1').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        416,
+        64
+      ],
+      "id": "7e999f03-2dfd-408e-9699-d19e2b216de8",
+      "name": "Delete folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-oss:120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        128,
+        256
+      ],
+      "id": "dda33eee-3783-4535-9d87-6ad18de17c5a",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "6Y8FpvYhLX0sAe5z",
+          "name": "Ollama account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Create folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder": {
+      "main": [
+        [
+          {
+            "node": "Create folder1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder1": {
+      "main": [
+        [
+          {
+            "node": "Create folder2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder2": {
+      "main": [
+        [
+          {
+            "node": "Create folder3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder3": {
+      "main": [
+        [
+          {
+            "node": "Create folder4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder4": {
+      "main": [
+        [
+          {
+            "node": "Create folder5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder5": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder6": {
+      "main": [
+        [
+          {
+            "node": "Rechercher Dossier Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Create folder6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rechercher Dossier Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rechercher Dossier Drive1": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Delete folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete folder": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "735d21e6-389a-4a32-a191-5222b8847c26",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "276b75ddf92a47b01772b58ed8bd2e37f8a10b5a9f518021c98717c626acb239"
+  },
+  "nodeGroups": [],
+  "id": "NjN1GQiLZ6nXxiOB",
+  "tags": []
+}

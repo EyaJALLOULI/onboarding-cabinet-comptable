@@ -1,0 +1,745 @@
+{
+  "name": "SUB - Nouvelle Ligne + Mail RA",
+  "nodes": [
+    {
+      "parameters": {
+        "sendTo": "={{ $env.MAIL_RA }}",
+        "subject": "=Nouveau client à valider — {{ $('Start').item.json.nom_societe }}",
+        "message": "=<p>Bonjour,</p>\n<p>Un nouveau client a été ajouté et nécessite votre validation.</p>\n<p>\n<strong>ID client :</strong> {{ $('Start').item.json.clientId }}<br>\n<strong>Société :</strong> {{ $('Start').item.json.nom_societe }}\n</p>\n<p>\n<strong>Fichiers reçus :</strong><br>\n{{ $('HTTP Request2').item.json.files && $('HTTP Request2').item.json.files.length > 0 ? $('HTTP Request2').item.json.files.map(f => f.name).join('<br>') : 'Aucun fichier' }}\n</p>\n<p style=\"background-color:#fdecea; border-left:4px solid #e74c3c; padding:10px 15px;\">\n<strong>Documents manquants :</strong><br>\n{{ $('JS-Extraire Manquants').item.json.documents_manquants && $('JS-Extraire Manquants').item.json.documents_manquants.length > 0 ? $('JS-Extraire Manquants').item.json.documents_manquants.join('<br>') : 'Aucun — dossier complet' }}\n</p>\n<p>Merci de consulter la fiche dans le Google Sheet \"Clients\" pour validation (colonne <strong>feu_vert</strong>).</p>\n<p>Cordialement,<br>\nSystème automatique Colead Finance</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        768
+      ],
+      "id": "9f3922c6-6ce4-470a-a1a3-9277f9b0fe82",
+      "name": "Send a message",
+      "webhookId": "b7a65584-5bc2-46b0-959c-02cfd151784a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OJhqSL3TB54B6eGJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "KJnb27jccuPOrofP",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/KJnb27jccuPOrofP",
+          "cachedResultName": "Créer Dossier et Uploader PDF"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "output": "={{ $('Start').first().json.output_firstItem }}",
+            "JSDdupliquer__allItems": "={{ $('Start').first().json.JSDdupliquer__allItems }}",
+            "output_firstItem": "={{ $('Start').first().json.output_firstItem }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "output",
+              "displayName": "output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "JSDdupliquer__allItems",
+              "displayName": "JSDdupliquer__allItems",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "output_firstItem",
+              "displayName": "output_firstItem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "folderId",
+              "displayName": "folderId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        624
+      ],
+      "name": "Call Créer Dossier et Uploader PDF",
+      "id": "09689bf6-ec50-45fc-8192-99d5deedb82c"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Feuille 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JR8Strqf_iTYnM7RZD-mrg1GW652K58egB6Ela7pdQw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ $('Start').item.json.today }}   ",
+            "nom_société": "={{ $json.nom_societe }}",
+            "email_client": "={{ $json.email_client }}",
+            "parcours": "={{ $json.parcours }}",
+            "juridique": "={{ $json.juridique }}",
+            "siret": "={{ $json.siret}}",
+            "id": "={{ $json.id }}",
+            "capital_social": "={{ $json.capital_social }}",
+            "honoraires_comptabilite_annuel": "={{ $json.honoraires_comptabilite_annuel }}",
+            "honoraires_juridique": "={{ $json.honoraires_juridique }}",
+            "tarif_bulletin_paie": "={{ $json.tarif_bulletin_paie }}",
+            "email_associé": "={{ $json['email_associé'] }}",
+            "tel_associé": "={{ \"'\" + $json.tel_associe }}",
+            "tel_client": "={{ $json.tel_client }}",
+            "nom_associé": "={{ $json['nom_associé'] }}",
+            "nom_client": "={{ $json.nom_client }}",
+            "paie": "={{ $json.paie }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nom_société",
+              "displayName": "nom_société",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email_client",
+              "displayName": "email_client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nom_client",
+              "displayName": "nom_client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "tel_client",
+              "displayName": "tel_client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "siret",
+              "displayName": "siret",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "parcours",
+              "displayName": "parcours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "paie",
+              "displayName": "paie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "juridique",
+              "displayName": "juridique",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "feu_vert",
+              "displayName": "feu_vert",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nom_associé",
+              "displayName": "nom_associé",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email_associé",
+              "displayName": "email_associé",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "tel_associé",
+              "displayName": "tel_associé",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "statut_dossier",
+              "displayName": "statut_dossier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "regle_bloquante_statut",
+              "displayName": "regle_bloquante_statut",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "regle_bloquante_date_creation",
+              "displayName": "regle_bloquante_date_creation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "regle_bloquante_date_levee",
+              "displayName": "regle_bloquante_date_levee",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "regle_bloquante_commentaire",
+              "displayName": "regle_bloquante_commentaire",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "date_derniere_relance",
+              "displayName": "date_derniere_relance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "checklist_complete",
+              "displayName": "checklist_complete",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "silae_statut",
+              "displayName": "silae_statut",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "forme_juridique",
+              "displayName": "forme_juridique",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "pennylane_statut",
+              "displayName": "pennylane_statut",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "honoraires_comptabilite_annuel",
+              "displayName": "honoraires_comptabilite_annuel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "tarif_bulletin_paie",
+              "displayName": "tarif_bulletin_paie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "honoraires_juridique",
+              "displayName": "honoraires_juridique",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "capital_social",
+              "displayName": "capital_social",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "adresse_société ",
+              "displayName": "adresse_société ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -432,
+        624
+      ],
+      "id": "14c92fa4-c85e-43d8-ab19-9cc9cfa48be9",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "elK5R6515RvJ26Xl",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $('Start').item.json.nom_societe }} - À valider",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -48,
+        640
+      ],
+      "id": "cb218c4f-96ea-4b5c-a588-346d16fec27f",
+      "name": "Rechercher Dossier Drive3",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-oss:120b",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        464,
+        864
+      ],
+      "id": "e751a657-6961-46c5-b943-3278955871fc",
+      "name": "Ollama Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "6Y8FpvYhLX0sAe5z",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.text || $json.output;\nlet parsed;\n\nfunction extraireDernierJson(texte) {\n  // Cherche toutes les positions de '{' et tente de parser depuis chacune, en partant de la fin\n  const positions = [];\n  for (let i = 0; i < texte.length; i++) {\n    if (texte[i] === '{') positions.push(i);\n  }\n  // Essaie depuis la dernière position vers la première\n  for (let i = positions.length - 1; i >= 0; i--) {\n    const sousChaine = texte.substring(positions[i]);\n    try {\n      // Trouve la fin du JSON en comptant les accolades\n      let profondeur = 0;\n      let fin = -1;\n      for (let j = 0; j < sousChaine.length; j++) {\n        if (sousChaine[j] === '{') profondeur++;\n        if (sousChaine[j] === '}') {\n          profondeur--;\n          if (profondeur === 0) { fin = j; break; }\n        }\n      }\n      if (fin !== -1) {\n        const candidat = sousChaine.substring(0, fin + 1);\n        return JSON.parse(candidat);\n      }\n    } catch (e) {\n      continue;\n    }\n  }\n  throw new Error('Aucun JSON valide trouvé');\n}\n\ntry {\n  parsed = typeof raw === 'object' ? raw : extraireDernierJson(raw);\n} catch (e) {\n  parsed = {\n    complet: false,\n    documents_manquants: ['erreur_parsing_llm'],\n    erreur_brute: String(raw).substring(0, 300)\n  };\n}\n\nreturn [{\n  json: {\n    ...$json,\n    ...parsed\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        752
+      ],
+      "id": "3587bea3-08b8-4d13-934f-32c4efd35dc1",
+      "name": "JS-Extraire Manquants"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tu es un assistant conformité pour Colead Finance, cabinet comptable.\nTu vérifies la complétude documentaire d'un dossier d'onboarding client selon la checklist RGPD/LAB obligatoire.\n\nCHECKLIST OBLIGATOIRE (documents requis) :\n1. Identité — pièce d'identité du dirigeant ou bénéficiaire effectif\n2. KBIS — extrait Kbis de la société\n3. Statuts — statuts juridiques de la société\n4. BE — déclaration des bénéficiaires effectifs (obligatoire LAB/LCB-FT)\n5. RIB — relevé d'identité bancaire\n\nDOCUMENTS REÇUS (extraits OCR) :\n{{ $('Start').item.json.texteOCR }}\n\nNOMS DE FICHIERS REÇUS :\n{{ $('Start').item.json.filename }}\n\nINSTRUCTIONS :\n1. Pour chaque document de la checklist, détermine s'il est présent parmi les documents reçus, en te basant sur le contenu OCR (pas uniquement le nom de fichier — un Kbis peut être nommé \"document1.pdf\" mais son contenu OCR mentionne \"EXTRAIT KBIS\").\n2. Ignore les documents reçus qui ne correspondent à aucune catégorie de la checklist (ex: registre des mouvements de titres, accord actionnaires) — ce ne sont pas des manquants, juste des pièces hors-checklist.\n3. Retourne UNIQUEMENT le JSON ci-dessous.\n\nFORMAT DE SORTIE :\n{\n  \"identite\": \"present\" ou \"manquant\",\n  \"kbis\": \"present\" ou \"manquant\",\n  \"statuts\": \"present\" ou \"manquant\",\n  \"be\": \"present\" ou \"manquant\",\n  \"rib\": \"present\" ou \"manquant\",\n  \"documents_manquants\": [\"liste des noms de documents manquants, ex: Identité, RIB\"],\n  \"complet\": true ou false\n}\n\nRÈGLES :\n- \"complet\": true uniquement si TOUS les 5 documents sont \"present\"\n- documents_manquants doit être vide [] si complet est true\n\nIMPORTANT : Ne montre AUCUN raisonnement, AUCUNE explication, AUCUN texte avant ou après.\nTa réponse doit commencer directement par { et se terminer par }.\nToute réponse contenant du texte en dehors du JSON sera rejetée par le système.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        448,
+        704
+      ],
+      "id": "04eb6ee8-f820-41f4-a36f-18a990098c13",
+      "name": "LLM-Extraire Manquants"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/drive/v3/files?q='{{ $('Rechercher Dossier Drive3').first().json.id }}' in parents&fields=files(name)",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        688
+      ],
+      "id": "f8214720-e174-485c-9443-29f1f7a70dcc",
+      "name": "HTTP Request2",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "output_replace",
+              "type": "any"
+            },
+            {
+              "name": "clientId",
+              "type": "any"
+            },
+            {
+              "name": "output_firstItem",
+              "type": "any"
+            },
+            {
+              "name": "JSDdupliquer__allItems",
+              "type": "any"
+            },
+            {
+              "name": "today",
+              "type": "any"
+            },
+            {
+              "name": "nom_societe",
+              "type": "any"
+            },
+            {
+              "name": "email_client",
+              "type": "any"
+            },
+            {
+              "name": "parcours",
+              "type": "any"
+            },
+            {
+              "name": "juridique",
+              "type": "any"
+            },
+            {
+              "name": "siret",
+              "type": "any"
+            },
+            {
+              "name": "id",
+              "type": "any"
+            },
+            {
+              "name": "capital_social",
+              "type": "any"
+            },
+            {
+              "name": "honoraires_comptabilite_annuel",
+              "type": "any"
+            },
+            {
+              "name": "honoraires_juridique",
+              "type": "any"
+            },
+            {
+              "name": "tarif_bulletin_paie",
+              "type": "any"
+            },
+            {
+              "name": "tel_client",
+              "type": "any"
+            },
+            {
+              "name": "nom_client",
+              "type": "any"
+            },
+            {
+              "name": "paie",
+              "type": "any"
+            },
+            {
+              "name": "texteOCR",
+              "type": "any"
+            },
+            {
+              "name": "filename",
+              "type": "any"
+            },
+            {
+              "name": "nom_associé"
+            },
+            {
+              "name": "email_associé"
+            },
+            {
+              "name": "tel_associe"
+            }
+          ]
+        }
+      },
+      "id": "e4af87bf-48e9-46d9-ad93-0bac85c72293",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -640,
+        624
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Call Créer Dossier et Uploader PDF": {
+      "main": [
+        [
+          {
+            "node": "Rechercher Dossier Drive3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Call Créer Dossier et Uploader PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rechercher Dossier Drive3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "LLM-Extraire Manquants",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS-Extraire Manquants": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM-Extraire Manquants": {
+      "main": [
+        [
+          {
+            "node": "JS-Extraire Manquants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "LLM-Extraire Manquants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ed5f2a6c-eca7-4f71-8a02-532c48a2d236",
+  "meta": {
+    "instanceId": "276b75ddf92a47b01772b58ed8bd2e37f8a10b5a9f518021c98717c626acb239"
+  },
+  "nodeGroups": [],
+  "id": "und7mpb7sDTCZI4n",
+  "tags": []
+}

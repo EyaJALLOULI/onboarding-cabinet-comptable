@@ -1,0 +1,597 @@
+{
+  "name": "Sub - MAJ Données et Pièces Jointes",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1fb045fd-206e-44c4-8372-b8f71e20f83a",
+              "leftValue": "={{ $('Start').item.json.differences }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -544,
+        400
+      ],
+      "id": "2347b722-01cd-4b90-aeb3-47f9ea6a5f9a",
+      "name": "difference "
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "3IJ3kwOUMnnYnZC3",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/3IJ3kwOUMnnYnZC3",
+          "cachedResultName": "nouv_pj"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "output": "={{ $('Start').item.json.output }}",
+            "JSDdupliquer__allItems": "={{ $('Start').first().json.JSDdupliquer__allItems_firstItem }}"
+          },
+          "matchingColumns": [
+            "output",
+            "JSDdupliquer__allItems"
+          ],
+          "schema": [
+            {
+              "id": "output",
+              "displayName": "output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "JSDdupliquer__allItems",
+              "displayName": "JSDdupliquer__allItems",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        384
+      ],
+      "name": "Call nouv_pj",
+      "id": "a338e8d4-a81f-4e02-af6f-2264bae2b291"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "11789373-08f7-49ee-85c5-8aa53035b102",
+              "leftValue": "={{ $json.hasNewFiles }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        736,
+        384
+      ],
+      "id": "b234df3e-a191-4dbe-aece-d9b6759f9b17",
+      "name": "if hasNewFiles"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "PRu1W7P5taqMa6mD",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/PRu1W7P5taqMa6mD",
+          "cachedResultName": "Call Créer Dossier et Uploader PDF1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "output": "={{ $('Start').first().json.output_firstItem_firstItem }}",
+            "JSDdupliquer__allItems": "={{ $('Call nouv_pj').first().json.JSFiltrer_Nouveaux_Fichiers_allItems }}",
+            "output_firstItem": "={{ $('Start').first().json._firstItem_firstItem }}",
+            "folderId": "={{ $('Call nouv_pj').first().json.id_firstItem }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "output",
+              "displayName": "output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "JSDdupliquer__allItems",
+              "displayName": "JSDdupliquer__allItems",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "output_firstItem",
+              "displayName": "output_firstItem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "folderId",
+              "displayName": "folderId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        928,
+        368
+      ],
+      "name": "Call Créer Dossier et Uploader PDF1",
+      "id": "012ae4bb-de31-4a22-92e2-13a054045f11"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "06f5e1b0-55f1-4ae8-ae28-1fea3a28c9af",
+              "leftValue": "={{ $('Start').item.json.existingRowData_feu_vert }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -336,
+        288
+      ],
+      "id": "1557a3df-ea0a-4f43-bb36-70bf887cc190",
+      "name": "If-feu_vert vide"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.MAIL_RA }}",
+        "subject": "=Nouveau document reçu — client déjà validé — {{ JSON.parse($('Start').item.json.output).nom_societe }}",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n  <div style=\"background-color: #FEF3C7; border-left: 4px solid #F59E0B; padding: 16px; margin-bottom: 16px;\">\n    <strong style=\"color: #92400E;\">⚠️ Doublon détecté — client déjà validé</strong>\n  </div>\n\n  <p>Bonjour,</p>\n  <p>Un nouvel email a été reçu pour un client <strong>déjà validé</strong>. Aucune modification automatique n'a été appliquée.</p>\n\n  <table style=\"width: 100%; border-collapse: collapse; margin: 16px 0;\">\n    <tr>\n      <td style=\"padding: 6px 8px; background-color: #F3F4F6; font-weight: bold; width: 160px;\">Société</td>\n      <td style=\"padding: 6px 8px;\">{{ JSON.parse($('Start').item.json.output).nom_societe }}</td>\n    </tr>\n    <tr>\n      <td style=\"padding: 6px 8px; background-color: #F3F4F6; font-weight: bold;\">Email client</td>\n      <td style=\"padding: 6px 8px;\">{{ $('Start').first().json.email_client_firstItem }}</td>\n    </tr>\n    <tr>\n      <td style=\"padding: 6px 8px; background-color: #F3F4F6; font-weight: bold;\">Statut feu vert</td>\n      <td style=\"padding: 6px 8px; color: #059669; font-weight: bold;\">Oui</td>\n    </tr>\n  </table>\n\n  <p style=\"font-weight: bold; margin-bottom: 4px;\">Différences détectées :</p>\n  <table style=\"width: 100%; border-collapse: collapse; border: 1px solid #E5E7EB;\">\n    <tr style=\"background-color: #F3F4F6;\">\n      <th style=\"padding: 6px 8px; text-align: left; border: 1px solid #E5E7EB;\">Champ</th>\n      <th style=\"padding: 6px 8px; text-align: left; border: 1px solid #E5E7EB;\">Ancien</th>\n      <th style=\"padding: 6px 8px; text-align: left; border: 1px solid #E5E7EB;\">Nouveau</th>\n    </tr>\n    {{ $('Start').item.json.differences_map(d => `\n    <tr>\n      <td style=\"padding: 6px 8px; border: 1px solid #E5E7EB;\">${d.field}</td>\n      <td style=\"padding: 6px 8px; border: 1px solid #E5E7EB; color: #DC2626;\">${d.ancien}</td>\n      <td style=\"padding: 6px 8px; border: 1px solid #E5E7EB; color: #059669;\">${d.nouveau}</td>\n    </tr>`).join('') }}\n  </table>\n\n  <p style=\"margin-top: 16px;\">Merci de vérifier et traiter manuellement si nécessaire.</p>\n\n  <p style=\"color: #6B7280; font-size: 12px; margin-top: 24px;\">\n    Cordialement,<br>Système automatique Colead Finance\n  </p>\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -32,
+        288
+      ],
+      "id": "3a87c0e6-6a1b-4540-84c6-001f852a0a5f",
+      "name": "Send a message1",
+      "webhookId": "b7a65584-5bc2-46b0-959c-02cfd151784a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OJhqSL3TB54B6eGJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Node: JS-Fusionner Champs Vides\n// Mode : Run Once for All Items\n// Règle : \n//   - Complète les champs vides/FALSE avec les nouvelles valeurs\n//   - Met à jour les champs qui ont changé (differences détectées par JS-Détecter Doublon)\n\nconst detected = $('Start').first().json._firstItem;\nconst oldData = detected.existingRowData || {};\nconst differences = detected.differences || [];\n\nfunction isEmptyValue(v) {\n  if (v === undefined || v === null) return true;\n  const s = String(v).trim().toUpperCase();\n  return s === '' || s === 'FALSE' || s === 'NON RENSEIGNÉ';\n}\n\nconst fieldsToMerge = ['nom_société', 'email_client', 'siret', 'parcours', 'paie', 'juridique'];\nconst merged = { ...oldData };\nconst changedFields = [];\n\n// Construire un dictionnaire des champs qui ont changé\nconst diffMap = {};\nfor (const diff of differences) {\n  diffMap[diff.field] = diff.nouveau;\n}\n\nfor (const field of fieldsToMerge) {\n  const oldVal = oldData[field];\n  const newVal = detected[field] !== undefined\n    ? detected[field]\n    : detected[field.replace('é', 'e').replace('è', 'e')];\n\n  // Cas 1 : champ vide/FALSE → compléter avec la nouvelle valeur\n  if (isEmptyValue(oldVal) && !isEmptyValue(newVal)) {\n    merged[field] = newVal;\n    changedFields.push(field);\n  }\n  // Cas 2 : champ différent détecté par differences → remplacer par la nouvelle valeur\n  else if (diffMap[field] !== undefined) {\n    merged[field] = diffMap[field];\n    changedFields.push(field);\n  }\n}\n\nreturn {\n  json: {\n    ...merged,\n    existingRowNumber: detected.existingRowNumber,\n    changedFields,\n    hasChanges: changedFields.length > 0\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        96
+      ],
+      "id": "7b87e590-d99e-4e35-9e4c-afa826fb3f93",
+      "name": "JS-Fusionner Champs"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "id",
+          "value": "gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "email_client": "={{ $json.email_client }}",
+            "siret": "={{ $json.siret }}",
+            "parcours": "={{ $json.parcours }}",
+            "paie": "={{ $json.paie }}",
+            "juridique": "={{ $json.juridique }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nom_société",
+              "displayName": "nom_société",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email_client",
+              "displayName": "email_client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "siret",
+              "displayName": "siret",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "parcours",
+              "displayName": "parcours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "paie",
+              "displayName": "paie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "juridique",
+              "displayName": "juridique",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "feu_vert",
+              "displayName": "feu_vert",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Associé",
+              "displayName": "Associé",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        112,
+        96
+      ],
+      "id": "af45e9a0-d9ae-490e-9582-e4a5377e50ba",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "elK5R6515RvJ26Xl",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "output_firstItem_firstItem",
+              "type": "any"
+            },
+            {
+              "name": "_firstItem_firstItem",
+              "type": "any"
+            },
+            {
+              "name": "_firstItem",
+              "type": "any"
+            },
+            {
+              "name": "existingRowData_feu_vert",
+              "type": "any"
+            },
+            {
+              "name": "output",
+              "type": "any"
+            },
+            {
+              "name": "email_client_firstItem",
+              "type": "any"
+            },
+            {
+              "name": "differences_map",
+              "type": "any"
+            },
+            {
+              "name": "differences",
+              "type": "any"
+            },
+            {
+              "name": "JSDdupliquer__allItems_firstItem",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "b352df86-9320-4d94-b50b-a47a5ed83d78",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -752,
+        400
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Call Créer Dossier et Uploader PDF1": {
+      "main": [
+        []
+      ]
+    },
+    "JS-Fusionner Champs": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Call nouv_pj",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If-feu_vert vide": {
+      "main": [
+        [
+          {
+            "node": "JS-Fusionner Champs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "difference ": {
+      "main": [
+        [
+          {
+            "node": "If-feu_vert vide",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call nouv_pj",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call nouv_pj": {
+      "main": [
+        [
+          {
+            "node": "if hasNewFiles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if hasNewFiles": {
+      "main": [
+        [
+          {
+            "node": "Call Créer Dossier et Uploader PDF1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Call nouv_pj",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "difference ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "712f8aa4-d637-4ba0-8683-7b7b84c8dd6e",
+  "meta": {
+    "instanceId": "276b75ddf92a47b01772b58ed8bd2e37f8a10b5a9f518021c98717c626acb239"
+  },
+  "nodeGroups": [],
+  "id": "Exkr8LYJfJ6yGCHj",
+  "tags": []
+}

@@ -1,0 +1,347 @@
+{
+  "name": "Call Créer Dossier et Uploader PDF1",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ JSON.parse($json.output).nom_societe }} - À valider",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1OltBw38b5vQ05CW9zBcrRdCO-toy_hwn",
+          "mode": "list",
+          "cachedResultName": "00_PRE_ONBOARDING ",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1OltBw38b5vQ05CW9zBcrRdCO-toy_hwn"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        448,
+        80
+      ],
+      "id": "940c73d4-4032-4ccc-82b3-5be4821a4920",
+      "name": "Create folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Si folderId fourni dans Start (cas doublon) → utilise-le\n// Sinon → utilise l'ID du dossier créé par \"Create folder\" (cas nouveau client)\nlet folderId;\ntry {\n  folderId = $('Start').first().json.folderId || $('Create folder').first().json.id;\n} catch(e) {\n  folderId = $('Start').first().json.folderId;\n}\n\n// 🔧 Parse si c'est une string JSON au lieu d'un tableau\nlet rawFichiers = $('Start').first().json.JSDdupliquer__allItems || [];\nif (typeof rawFichiers === 'string') {\n  rawFichiers = JSON.parse(rawFichiers);\n}\n\nconst fichiers = rawFichiers.map(item => item.json ?? item);\n\nreturn fichiers.map(f => ({\n  json: {\n    folderId,\n    filename: f.filename,\n    messageId: f.messageId,\n    attachmentId: f.attachmentId,\n    hash: f.hash  // hash Gmail MD5 hex pour stockage dans description Drive\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "d5e65004-9f44-4c22-a4b8-ae9357725c8d",
+      "name": "Préparer fichiers Drive"
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.filename }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Préparer fichiers Drive').item.json.folderId }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1568,
+        80
+      ],
+      "id": "18347897-a786-4a48-a354-b911529d26be",
+      "name": "Upload file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst results = [];\nconst today = new Date().toISOString().split('T')[0];\n\n// ============ RÉCUPÉRATION DU NOM DE SOCIÉTÉ (depuis Start.output) ============\nlet nomSociete = 'Societe';\ntry {\n  const startOutput = $('Start').first().json.output;\n  const parsedOutput = typeof startOutput === 'string' ? JSON.parse(startOutput) : startOutput;\n  if (parsedOutput && parsedOutput.nom_societe) {\n    nomSociete = parsedOutput.nom_societe.trim().replace(/\\s+/g, '_');\n  }\n} catch (e) {\n  console.log('Impossible de récupérer nom_societe depuis Start:', e.message);\n}\nconsole.log('>>> NOM SOCIÉTÉ:', nomSociete);\n\n// ============ RÉCUPÉRATION DU FILENAME ORIGINAL (depuis Start.JSDdupliquer__allItems) ============\nlet filenameOrigine = 'document.pdf';\ntry {\n  let rawFiles = $('Start').first().json.JSDdupliquer__allItems;\n  if (typeof rawFiles === 'string') rawFiles = JSON.parse(rawFiles);\n  const firstFile = (rawFiles[0]?.json) ?? rawFiles[0];\n  if (firstFile && firstFile.filename) {\n    filenameOrigine = firstFile.filename;\n  }\n} catch (e) {\n  console.log('Impossible de récupérer filename depuis Start:', e.message);\n}\nconsole.log('>>> FILENAME ORIGINE:', filenameOrigine);\n\n// ============ MD5 ============\nfunction md5(buffer) {\n  function safeAdd(x, y) {\n    const lsw = (x & 0xFFFF) + (y & 0xFFFF);\n    return (((x >> 16) + (y >> 16) + (lsw >> 16)) << 16) | (lsw & 0xFFFF);\n  }\n  function bitRotateLeft(num, cnt) { return (num << cnt) | (num >>> (32 - cnt)); }\n  function md5cmn(q, a, b, x, s, t) { return safeAdd(bitRotateLeft(safeAdd(safeAdd(a, q), safeAdd(x, t)), s), b); }\n  function md5ff(a, b, c, d, x, s, t) { return md5cmn((b & c) | ((~b) & d), a, b, x, s, t); }\n  function md5gg(a, b, c, d, x, s, t) { return md5cmn((b & d) | (c & (~d)), a, b, x, s, t); }\n  function md5hh(a, b, c, d, x, s, t) { return md5cmn(b ^ c ^ d, a, b, x, s, t); }\n  function md5ii(a, b, c, d, x, s, t) { return md5cmn(c ^ (b | (~d)), a, b, x, s, t); }\n\n  const bytes = Array.from(buffer);\n  const len = bytes.length;\n  const words = [];\n  for (let i = 0; i < len; i++) words[i >> 2] |= bytes[i] << ((i % 4) * 8);\n  words[len >> 2] |= 0x80 << ((len % 4) * 8);\n  words[(((len + 8) >> 6) << 4) + 14] = len * 8;\n\n  let a = 1732584193, b = -271733879, c = -1732584194, d = 271733878;\n\n  for (let i = 0; i < words.length; i += 16) {\n    const [oa, ob, oc, od] = [a, b, c, d];\n    a = md5ff(a, b, c, d, words[i + 0], 7, -680876936); d = md5ff(d, a, b, c, words[i + 1], 12, -389564586);\n    c = md5ff(c, d, a, b, words[i + 2], 17, 606105819); b = md5ff(b, c, d, a, words[i + 3], 22, -1044525330);\n    a = md5ff(a, b, c, d, words[i + 4], 7, -176418897); d = md5ff(d, a, b, c, words[i + 5], 12, 1200080426);\n    c = md5ff(c, d, a, b, words[i + 6], 17, -1473231341); b = md5ff(b, c, d, a, words[i + 7], 22, -45705983);\n    a = md5ff(a, b, c, d, words[i + 8], 7, 1770035416); d = md5ff(d, a, b, c, words[i + 9], 12, -1958414417);\n    c = md5ff(c, d, a, b, words[i + 10], 17, -42063); b = md5ff(b, c, d, a, words[i + 11], 22, -1990404162);\n    a = md5ff(a, b, c, d, words[i + 12], 7, 1804603682); d = md5ff(d, a, b, c, words[i + 13], 12, -40341101);\n    c = md5ff(c, d, a, b, words[i + 14], 17, -1502002290); b = md5ff(b, c, d, a, words[i + 15], 22, 1236535329);\n\n    a = md5gg(a, b, c, d, words[i + 1], 5, -165796510); d = md5gg(d, a, b, c, words[i + 6], 9, -1069501632);\n    c = md5gg(c, d, a, b, words[i + 11], 14, 643717713); b = md5gg(b, c, d, a, words[i + 0], 20, -373897302);\n    a = md5gg(a, b, c, d, words[i + 5], 5, -701558691); d = md5gg(d, a, b, c, words[i + 10], 9, 38016083);\n    c = md5gg(c, d, a, b, words[i + 15], 14, -660478335); b = md5gg(b, c, d, a, words[i + 4], 20, -405537848);\n    a = md5gg(a, b, c, d, words[i + 9], 5, 568446438); d = md5gg(d, a, b, c, words[i + 14], 9, -1019803690);\n    c = md5gg(c, d, a, b, words[i + 3], 14, -187363961); b = md5gg(b, c, d, a, words[i + 8], 20, 1163531501);\n    a = md5gg(a, b, c, d, words[i + 13], 5, -1444681467); d = md5gg(d, a, b, c, words[i + 2], 9, -51403784);\n    c = md5gg(c, d, a, b, words[i + 7], 14, 1735328473); b = md5gg(b, c, d, a, words[i + 12], 20, -1926607734);\n\n    a = md5hh(a, b, c, d, words[i + 5], 4, -378558); d = md5hh(d, a, b, c, words[i + 8], 11, -2022574463);\n    c = md5hh(c, d, a, b, words[i + 11], 16, 1839030562); b = md5hh(b, c, d, a, words[i + 14], 23, -35309556);\n    a = md5hh(a, b, c, d, words[i + 1], 4, -1530992060); d = md5hh(d, a, b, c, words[i + 4], 11, 1272893353);\n    c = md5hh(c, d, a, b, words[i + 7], 16, -155497632); b = md5hh(b, c, d, a, words[i + 10], 23, -1094730640);\n    a = md5hh(a, b, c, d, words[i + 13], 4, 681279174); d = md5hh(d, a, b, c, words[i + 0], 11, -358537222);\n    c = md5hh(c, d, a, b, words[i + 3], 16, -722521979); b = md5hh(b, c, d, a, words[i + 6], 23, 76029189);\n    a = md5hh(a, b, c, d, words[i + 9], 4, -640364487); d = md5hh(d, a, b, c, words[i + 12], 11, -421815835);\n    c = md5hh(c, d, a, b, words[i + 15], 16, 530742520); b = md5hh(b, c, d, a, words[i + 2], 23, -995338651);\n\n    a = md5ii(a, b, c, d, words[i + 0], 6, -198630844); d = md5ii(d, a, b, c, words[i + 7], 10, 1126891415);\n    c = md5ii(c, d, a, b, words[i + 14], 15, -1416354905); b = md5ii(b, c, d, a, words[i + 5], 21, -57434055);\n    a = md5ii(a, b, c, d, words[i + 12], 6, 1700485571); d = md5ii(d, a, b, c, words[i + 3], 10, -1894986606);\n    c = md5ii(c, d, a, b, words[i + 10], 15, -1051523); b = md5ii(b, c, d, a, words[i + 1], 21, -2054922799);\n    a = md5ii(a, b, c, d, words[i + 8], 6, 1873313359); d = md5ii(d, a, b, c, words[i + 15], 10, -30611744);\n    c = md5ii(c, d, a, b, words[i + 6], 15, -1560198380); b = md5ii(b, c, d, a, words[i + 13], 21, 1309151649);\n    a = md5ii(a, b, c, d, words[i + 4], 6, -145523070); d = md5ii(d, a, b, c, words[i + 11], 10, -1120210379);\n    c = md5ii(c, d, a, b, words[i + 2], 15, 718787259); b = md5ii(b, c, d, a, words[i + 9], 21, -343485551);\n\n    a = safeAdd(a, oa); b = safeAdd(b, ob); c = safeAdd(c, oc); d = safeAdd(d, od);\n  }\n\n  return [a, b, c, d]\n    .map(n => ('00000000' + ((n < 0 ? n + 0x100000000 : n).toString(16))).slice(-8).match(/../g).map(h => h[1] + h[0]).join(''))\n    .join('');\n}\n\n// ============ TRAITEMENT DES FICHIERS ============\nfor (let idx = 0; idx < items.length; idx++) {\n  const item = items[idx];\n  try {\n    const gmailResponse = item.json; // { size, data } venant de HTTP Request9\n\n    if (!gmailResponse || !gmailResponse.data) {\n      throw new Error(`Item ${idx}: pas de champ \"data\". Clés disponibles: ${Object.keys(item.json || {}).join(', ')}`);\n    }\n\n    const base64Standard = gmailResponse.data.replace(/-/g, '+').replace(/_/g, '/');\n    const pdfBuffer = Buffer.from(base64Standard, 'base64');\n\n    const driveHash = md5(pdfBuffer);\n\n    const nomActuel = filenameOrigine;\n    const extension = nomActuel.includes('.') ? nomActuel.split('.').pop() : 'pdf';\n    const typeDoc = nomActuel.includes('.') ? nomActuel.substring(0, nomActuel.lastIndexOf('.')) : nomActuel;\n\n    const nouveauNom = `${today}_${nomSociete}_${typeDoc}.${extension}`;\n\n    results.push({\n      json: {\n        ...item.json,\n        filename: nouveauNom,\n        driveHash\n      },\n      binary: {\n        data: await this.helpers.prepareBinaryData(\n          pdfBuffer,\n          nouveauNom,\n          'application/pdf'\n        )\n      }\n    });\n  } catch (e) {\n    const errMsg = e instanceof Error ? e.message : (typeof e === 'object' ? JSON.stringify(e) : String(e));\n    throw new Error(`Erreur sur item ${idx}: ${errMsg}`);\n  }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        80
+      ],
+      "id": "9e4b86d6-c1ec-4087-abc5-58afed2da756",
+      "name": "JS Decode PDF Drive"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d31f60cf-a9f8-491a-9801-c4a58dd00a01",
+              "leftValue": "={{ $json.folderId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "0fa0ac0d-0c8b-473b-a236-71a884a9a464",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "output",
+              "type": "any"
+            },
+            {
+              "name": "JSDdupliquer__allItems",
+              "type": "any"
+            },
+            {
+              "name": "output_firstItem",
+              "type": "any"
+            },
+            {
+              "name": "folderId"
+            }
+          ]
+        }
+      },
+      "id": "9e878210-8bf6-4a58-9394-987832b1040f",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://gmail.googleapis.com/gmail/v1/users/{{ $env.MAIL_ONBOARDING }}/messages/{{ $json.messageId }}/attachments/{{ $json.attachmentId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "gmailOAuth2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1120,
+        80
+      ],
+      "id": "81a9303a-beff-4b8f-b443-973b1c936b9c",
+      "name": "HTTP Request9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OJhqSL3TB54B6eGJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "35d50c4c-09dd-4cf9-80fe-ab5d18918763",
+              "leftValue": "={{ $json.attachmentId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        896,
+        0
+      ],
+      "id": "4339e459-9ddf-4f45-9f74-6a223b4fb4b9",
+      "name": "If there is an attachment"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1792,
+        0
+      ],
+      "id": "e1cb7262-db36-4bee-bc47-b0a35499d203",
+      "name": "No Operation, do nothing"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Create folder": {
+      "main": [
+        [
+          {
+            "node": "Préparer fichiers Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Préparer fichiers Drive": {
+      "main": [
+        [
+          {
+            "node": "If there is an attachment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS Decode PDF Drive": {
+      "main": [
+        [
+          {
+            "node": "Upload file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Préparer fichiers Drive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request9": {
+      "main": [
+        [
+          {
+            "node": "JS Decode PDF Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If there is an attachment": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request9",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "e96cf3ea-8c0c-4488-a604-0a60c917a6f5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "276b75ddf92a47b01772b58ed8bd2e37f8a10b5a9f518021c98717c626acb239"
+  },
+  "nodeGroups": [],
+  "id": "PRu1W7P5taqMa6mD",
+  "tags": []
+}
