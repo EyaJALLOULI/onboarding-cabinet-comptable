@@ -1,0 +1,345 @@
+{
+  "name": "Créer Dossier et Uploader PDF",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ JSON.parse($json.output).nom_societe }} - À valider",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1QQuW5bwFlpq4gHJ3W45p47CJEt4xlM1q"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -672,
+        144
+      ],
+      "id": "c39f9df7-425a-4fba-b210-ac71760df86d",
+      "name": "Create folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const folderId = $json.id;\nconst rawData = $('Start').first().json.JSDdupliquer__allItems;\n\nlet parsed;\nif (typeof rawData === 'string') {\n  parsed = JSON.parse(rawData);\n} else if (Array.isArray(rawData)) {\n  parsed = rawData;\n} else {\n  parsed = [];\n}\n\nconst fichiers = parsed.map(item => item.json);\n\nreturn fichiers.map(f => ({\n  json: {\n    folderId,\n    filename: f.filename,\n    messageId: f.messageId,\n    attachmentId: f.attachmentId\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        64
+      ],
+      "id": "70d8dc6d-eb9e-4ad2-a355-bfaf3a48d224",
+      "name": "Préparer fichiers Drive"
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.filename }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Préparer fichiers Drive').item.json.folderId }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "69a68b84-1783-447b-b86f-d265f07bdc06",
+      "name": "Upload file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst originaux = $('If there is an attachment').all();\nconst results = [];\n\nlet nomSociete = 'Societe';\ntry {\n  const agentOutput = $('Start').first().json.output_firstItem;\n  const parsed = typeof agentOutput === 'string' ? JSON.parse(agentOutput) : agentOutput;\n  nomSociete = (parsed?.nom_societe || 'Societe').replace(/\\s+/g, '');\n} catch (e) {\n  nomSociete = 'Societe';\n}\n\nconst today = new Date().toISOString().split('T')[0];\n\nfor (let i = 0; i < items.length; i++) {\n  const item = items[i];\n  const orig = originaux[i]?.json || {};\n\n  let gmailResponse;\n  if (item.binary && item.binary.data) {\n    const buffer = await this.helpers.getBinaryDataBuffer(i, 'data');\n    gmailResponse = JSON.parse(buffer.toString('utf-8'));\n  } else {\n    gmailResponse = item.json;\n  }\n\n  if (!gmailResponse || !gmailResponse.data) {\n    results.push({ json: { ...item.json, statut: 'erreur_pas_de_data' } });\n    continue;\n  }\n\n  const base64Standard = gmailResponse.data.replace(/-/g, '+').replace(/_/g, '/');\n  const pdfBuffer = Buffer.from(base64Standard, 'base64');\n\n  const nomOriginal = orig.filename || `document${i + 1}.pdf`;\n  const extension = nomOriginal.includes('.') ? nomOriginal.split('.').pop() : 'pdf';\n  const typeDoc = nomOriginal.includes('.') ? nomOriginal.substring(0, nomOriginal.lastIndexOf('.')) : nomOriginal;\n  const mimeType = orig.mimeType || 'application/pdf';\n\n  const nouveauNom = `${today}_${nomSociete}_${typeDoc}.${extension}`;\n\n  results.push({\n    json: { ...item.json, filename: nouveauNom },\n    binary: {\n      data: await this.helpers.prepareBinaryData(pdfBuffer, nouveauNom, mimeType)\n    }\n  });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "69cbb13e-4151-4179-b5a6-1557919ee23c",
+      "name": "JS Decode PDF Drive"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "output",
+              "type": "any"
+            },
+            {
+              "name": "JSDdupliquer__allItems",
+              "type": "any"
+            },
+            {
+              "name": "output_firstItem",
+              "type": "any"
+            },
+            {
+              "name": "folderId"
+            }
+          ]
+        }
+      },
+      "id": "a1075a9d-326f-48ce-94d7-771ee0b13920",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -1120,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d31f60cf-a9f8-491a-9801-c4a58dd00a01",
+              "leftValue": "={{ $json.folderId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -896,
+        80
+      ],
+      "id": "88d11788-daa5-4eb2-ae0e-5512f7052a92",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "35d50c4c-09dd-4cf9-80fe-ab5d18918763",
+              "leftValue": "={{ $json.attachmentId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -224,
+        80
+      ],
+      "id": "b8a32bdb-e27a-421c-8e07-9f49c1181dbe",
+      "name": "If there is an attachment"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        672,
+        80
+      ],
+      "id": "2000adf2-83a0-49c3-b319-b917c496e1f0",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "url": "=https://gmail.googleapis.com/gmail/v1/users/{{ $env.MAIL_ONBOARDING }}/messages/{{ $json.messageId }}/attachments/{{ $json.attachmentId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "gmailOAuth2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fcdb0dcf-a3a0-4845-99c1-864be19942b4",
+      "name": "HTTP Request9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OJhqSL3TB54B6eGJ",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Create folder": {
+      "main": [
+        [
+          {
+            "node": "Préparer fichiers Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Préparer fichiers Drive": {
+      "main": [
+        [
+          {
+            "node": "If there is an attachment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS Decode PDF Drive": {
+      "main": [
+        [
+          {
+            "node": "Upload file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Préparer fichiers Drive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If there is an attachment": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request9",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request9": {
+      "main": [
+        [
+          {
+            "node": "JS Decode PDF Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "e746baad-09ac-43ee-b7d7-143d3c78ed83",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "276b75ddf92a47b01772b58ed8bd2e37f8a10b5a9f518021c98717c626acb239"
+  },
+  "nodeGroups": [],
+  "id": "KJnb27jccuPOrofP",
+  "tags": []
+}

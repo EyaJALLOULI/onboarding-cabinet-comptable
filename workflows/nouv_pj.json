@@ -1,0 +1,182 @@
+{
+  "name": "nouv_pj",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ JSON.parse($('Start').item.json.output).nom_societe }} - À valider",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -544,
+        480
+      ],
+      "id": "b6cb503a-1f73-4241-8d24-e0c6009a6415",
+      "name": "Rechercher Dossier Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/drive/v3/files?q='{{ $('Rechercher Dossier Drive').first().json.id }}' in parents&fields=files(id,name,md5Checksum,description)",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -336,
+        480
+      ],
+      "id": "9351f691-9de7-497c-9d2c-dd2a3ec4e7ba",
+      "name": "HTTP Request1",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Node: JS-Filtrer Nouveaux Fichiers\n// Mode : Run Once for All Items\n// Le hash Gmail est maintenant calculé sur le PDF décodé = identique au md5Checksum Drive\n\n// ---------- MD5 des fichiers existants dans Drive ----------\nconst driveResponse = $('HTTP Request1').first().json;\nconst existingFiles = driveResponse.files || [];\nconst existingMD5s = new Set(existingFiles.map(f => f.md5Checksum).filter(Boolean));\n\n// ---------- Nouveaux fichiers depuis JS-Dédupliquer ----------\nlet rawNewFiles = $('Start').first().json.JSDdupliquer__allItems || [];\nif (typeof rawNewFiles === 'string') {\n  try { rawNewFiles = JSON.parse(rawNewFiles); } catch (e) {\n    return [{ json: { hasNewFiles: false, count: 0, error: 'Parse JSON échoué: ' + e.message } }];\n  }\n}\nconst newFiles = (Array.isArray(rawNewFiles) ? rawNewFiles : []).map(item => ({ json: item?.json ?? item }));\n\n// ---------- Déduplication ----------\nconst seenHashes = new Set();\nconst uniqueNewFiles = [];\n\nfor (const item of newFiles) {\n  const f = item.json;\n  const hash = f.hash; // MD5 du PDF décodé = même que Drive\n\n  if (!hash) continue;\n\n  // Doublon parmi les nouveaux ?\n  if (seenHashes.has(hash)) continue;\n  seenHashes.add(hash);\n\n  // Déjà présent dans Drive ?\n  if (existingMD5s.has(hash)) continue;\n\n  uniqueNewFiles.push({ json: { ...f, hasNewFiles: true } });\n}\n\n// ---------- Sortie ----------\nif (uniqueNewFiles.length === 0) {\n  return [{ json: { hasNewFiles: false, count: 0 } }];\n}\n\nreturn uniqueNewFiles;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        480
+      ],
+      "id": "28011501-7416-4168-b82f-b2df29367d71",
+      "name": "JS-Filtrer Nouveaux Fichiers"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cf11c4de-f662-4e6b-a155-0ed3be4b9d08",
+              "name": "JSFiltrer_Nouveaux_Fichiers_allItems",
+              "value": "={{ $('JS-Filtrer Nouveaux Fichiers').all() }}",
+              "type": "string"
+            },
+            {
+              "id": "c7ac4ffe-5da3-4d08-8b0b-64cdb6873c82",
+              "name": "id_firstItem",
+              "value": "={{ $('Rechercher Dossier Drive').first().json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "ca758398-d576-4922-847e-4ac70a3317f4",
+              "name": "hasNewFiles",
+              "value": "={{ $('JS-Filtrer Nouveaux Fichiers').all().some(item => item.json.hasNewFiles) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        128,
+        464
+      ],
+      "id": "4f0ce5ba-6d57-44fe-beca-adda48651b8b",
+      "name": "Return"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "output",
+              "type": "any"
+            },
+            {
+              "name": "JSDdupliquer__allItems",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "9ad73592-c509-4b24-8b0b-c76107661c20",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -752,
+        480
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Rechercher Dossier Drive": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "JS-Filtrer Nouveaux Fichiers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Rechercher Dossier Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS-Filtrer Nouveaux Fichiers": {
+      "main": [
+        [
+          {
+            "node": "Return",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a22420c0-5450-4f0d-a830-5d4469670e8b",
+  "meta": {
+    "instanceId": "276b75ddf92a47b01772b58ed8bd2e37f8a10b5a9f518021c98717c626acb239"
+  },
+  "nodeGroups": [],
+  "id": "3IJ3kwOUMnnYnZC3",
+  "tags": []
+}

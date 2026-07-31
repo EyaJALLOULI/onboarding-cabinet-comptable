@@ -1,0 +1,923 @@
+{
+  "name": "mail_collecte",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "998f3ee3-6b09-4745-afd0-5e4429572f04",
+              "leftValue": "={{ $json.statut_dossier }}",
+              "rightValue": "LM signée",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3fe12c02-554d-44d0-9eae-59231c8d0126",
+              "leftValue": "={{ $json.parcours }}",
+              "rightValue": "existante",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "d3a23206-ef7b-4781-8217-644a5be31edc",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Feuille 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8/edit#gid=0"
+        },
+        "event": "rowUpdate",
+        "options": {
+          "columnsToWatch": [
+            "statut_dossier"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "dd176cca-5850-4812-8bdf-e02946c04ddd",
+      "name": "Google Sheets Trigger1",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "mf0WVEtSiuwzT6dz",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tu es un assistant qui compare les pièces reçues d'un client à une checklist obligatoire pour un dossier comptable, et qui génère un email de collecte si nécessaire.\n\nTu ne dois jamais halluciner de pièces qui ne sont ni dans la liste reçue ni dans la checklist.\n\nVoici la liste des fichiers présents dans le dossier client (issue de Google Drive) :\n{{ $json.name }}\n\nVoici le lien sécurisé du dossier de collecte à utiliser dans l'email :\n{{ $json.webViewLink }}\n\nÉTAPE 1 — Comparaison\nUtilise l'outil Google Sheets pour récupérer la checklist des pièces obligatoires pour ce parcours.\nCompare la liste des fichiers reçus avec la checklist pour identifier les pièces reçues et les pièces manquantes.\n\nÉTAPE 2 — Email (uniquement si des pièces sont manquantes)\nSi complet = false, utilise l'outil Gmail pour envoyer un email de collecte au client.\n\nLe corps de l'email doit utiliser EXACTEMENT ce template HTML, en remplaçant uniquement les deux variables indiquées :\n\n<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;\">\n  <div style=\"background-color: #16746a; padding: 20px; border-radius: 6px 6px 0 0;\">\n    <h2 style=\"color: #ffffff; margin: 0; font-size: 18px;\">Colead Finance — Pièces à compléter</h2>\n  </div>\n  <div style=\"padding: 24px; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 6px 6px;\">\n    <p>Bonjour,</p>\n    <p>Nous vous remercions pour les documents déjà transmis. Afin de finaliser l'ouverture de votre dossier, il ne nous manque plus que les pièces suivantes :</p>\n    <ul style=\"background-color: #fdf3f0; border-left: 4px solid #d9534f; padding: 16px 16px 16px 32px; border-radius: 4px; margin: 16px 0;\">\n      {{LISTE_PIECES_MANQUANTES}}\n    </ul>\n    <p>Vous pouvez déposer ces documents directement via ce lien sécurisé :</p>\n    <p style=\"text-align: center; margin: 24px 0;\">\n      <a href=\"{{LIEN_DRIVE}}\" style=\"background-color: #16746a; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;\">Déposer mes documents</a>\n    </p>\n    <p>N'hésitez pas à nous contacter si vous avez la moindre question.</p>\n    <p style=\"margin-top: 24px;\">Cordialement,<br>L'équipe Colead Finance</p>\n  </div>\n  <div style=\"text-align: center; padding: 12px; color: #999; font-size: 12px;\">Colead Finance · Cabinet d'expertise comptable</div>\n</div>\n\nRègles de remplacement :\n- {{LISTE_PIECES_MANQUANTES}} : remplace par une balise <li>nom de la pièce</li> pour chaque pièce manquante\n- {{LIEN_DRIVE}} : remplace par le lien sécurisé du dossier de collecte fourni ci-dessus\n- Ne modifie pas la structure HTML, les styles, ni les couleurs du template\n\nNe l'envoie que si complet = false. Si complet = true, n'appelle pas l'outil Gmail.\n\nÉTAPE 3 — Réponse finale\nRéponds ensuite UNIQUEMENT en JSON strict, sans markdown, sans texte autour, format exact :\n{\n  \"pieces_recues\": [\"nom_piece_1\", \"nom_piece_2\"],\n  \"pieces_manquantes\": [\"nom_piece_3\"],\n  \"complet\": false\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2304,
+        0
+      ],
+      "id": "96c424c8-ed5a-4034-811a-fb03f80cd03f",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "model": "gpt-oss:120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        224
+      ],
+      "id": "468dcba2-bc7d-4354-98e8-c2fa94d83b72",
+      "name": "Ollama Chat Model2",
+      "credentials": {
+        "ollamaApi": {
+          "id": "6Y8FpvYhLX0sAe5z",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8",
+          "mode": "list",
+          "cachedResultName": "Clients",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1384601224,
+          "mode": "list",
+          "cachedResultName": "parcours3_recuperation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8/edit#gid=1384601224"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        2368,
+        224
+      ],
+      "id": "b43326a2-ebc0-423b-87bc-30fa643e1f02",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "elK5R6515RvJ26Xl",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "=id"
+            },
+            {
+              "fieldToAggregate": "name"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "1d5fe74b-bba4-4163-b460-7d81526163c0",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.MAIL_RA }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        2496,
+        224
+      ],
+      "id": "bce6d3a8-dc68-4a64-91cf-7090cfec9fd6",
+      "name": "Send a message in Gmail",
+      "webhookId": "ba0f1213-1001-47c9-bcf1-a9a7576cea0d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OJhqSL3TB54B6eGJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "share",
+        "folderNoRootId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "writer",
+            "type": "anyone"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1568,
+        80
+      ],
+      "id": "a4079dd5-39e0-490b-980e-61afae595253",
+      "name": "Share folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const folderId = $json.id;\n\nreturn [{\n  json: {\n    ...$json,\n    webViewLink: `https://drive.google.com/drive/folders/${folderId}`\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        0
+      ],
+      "id": "115e1c43-56a9-4059-9969-d3ef263b6503",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1792,
+        0
+      ],
+      "id": "1faa948b-2984-45b9-bb76-e55772bfee33",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "content": "mail de collecte",
+        "height": 80,
+        "width": 176
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -240,
+        32
+      ],
+      "typeVersion": 1,
+      "id": "9de44c53-a459-47ff-b421-7c7811742bf5",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $json['nom_société'] }} - {{ $json.siret }}",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "ddd45d30-b293-4917-8da0-6bd24060c06d",
+      "name": "Search folders (Clients)",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "=",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "whatToSearch": "folders"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        672,
+        0
+      ],
+      "id": "726061b9-91e0-41ec-a1b4-1e58d1ece6de",
+      "name": "Recherche de dossiers dans le dossier client",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "=",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": ""
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        896,
+        0
+      ],
+      "id": "61fd160f-6ff5-4fe0-972b-1b8450643805",
+      "name": "Recherche de fichiers dans les dossiers client",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $('Google Sheets Trigger1').item.json['nom_société'] }} - {{ $('Google Sheets Trigger1').item.json.siret }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1DQ0jBX2kVBQk_WJdIZR9NareJ9vZRZjB",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1344,
+        0
+      ],
+      "id": "cfb63b30-15ce-4d1e-89a1-7eb502f2430d",
+      "name": "Créer un dossier à partager avec le client",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8",
+          "mode": "list",
+          "cachedResultName": "Clients",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Feuille 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Google Sheets Trigger1').item.json.id }}",
+            "checklist_complete": "False",
+            "date_derniere_relance": "={{ $now.format('yyyy-MM-dd HH:mm') }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nom_société",
+              "displayName": "nom_société",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email_client",
+              "displayName": "email_client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nom_client",
+              "displayName": "nom_client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "tel_client",
+              "displayName": "tel_client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "siret",
+              "displayName": "siret",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "parcours",
+              "displayName": "parcours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "paie",
+              "displayName": "paie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "juridique",
+              "displayName": "juridique",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "feu_vert",
+              "displayName": "feu_vert",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "date_cloture",
+              "displayName": "date_cloture",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nom_associé",
+              "displayName": "nom_associé",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email_associé",
+              "displayName": "email_associé",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "tel_associé",
+              "displayName": "tel_associé",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "statut_dossier",
+              "displayName": "statut_dossier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "regle_bloquante_statut",
+              "displayName": "regle_bloquante_statut",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "regle_bloquante_date_creation",
+              "displayName": "regle_bloquante_date_creation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "regle_bloquante_date_levee",
+              "displayName": "regle_bloquante_date_levee",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "regle_bloquante_commentaire",
+              "displayName": "regle_bloquante_commentaire",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "date_derniere_relance",
+              "displayName": "date_derniere_relance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "checklist_complete",
+              "displayName": "checklist_complete",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "silae_statut",
+              "displayName": "silae_statut",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "forme_juridique",
+              "displayName": "forme_juridique",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "pennylane_statut",
+              "displayName": "pennylane_statut",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "honoraires_comptabilite_annuel",
+              "displayName": "honoraires_comptabilite_annuel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "tarif_bulletin_paie",
+              "displayName": "tarif_bulletin_paie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "honoraires_juridique",
+              "displayName": "honoraires_juridique",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "capital_social",
+              "displayName": "capital_social",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "adresse_société ",
+              "displayName": "adresse_société ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2704,
+        0
+      ],
+      "id": "a80316c2-d8b1-43cd-9b8f-e1004ab98444",
+      "name": "Update \"date_derniere_relance\"",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "elK5R6515RvJ26Xl",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Search folders (Clients)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Trigger1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Update \"date_derniere_relance\"",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Créer un dossier à partager avec le client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share folder": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search folders (Clients)": {
+      "main": [
+        [
+          {
+            "node": "Recherche de dossiers dans le dossier client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recherche de dossiers dans le dossier client": {
+      "main": [
+        [
+          {
+            "node": "Recherche de fichiers dans les dossiers client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recherche de fichiers dans les dossiers client": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Créer un dossier à partager avec le client": {
+      "main": [
+        [
+          {
+            "node": "Share folder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ae0646cc-5687-4064-bf17-cc6a5a967f78",
+  "meta": {
+    "instanceId": "276b75ddf92a47b01772b58ed8bd2e37f8a10b5a9f518021c98717c626acb239"
+  },
+  "nodeGroups": [],
+  "id": "Aa6yXYtuFAZgICJl",
+  "tags": []
+}

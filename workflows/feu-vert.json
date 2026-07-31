@@ -1,0 +1,2211 @@
+{
+  "name": "feu-vert",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "998f3ee3-6b09-4745-afd0-5e4429572f04",
+              "leftValue": "={{ $json.feu_vert }}",
+              "rightValue": "Oui",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1904,
+        -704
+      ],
+      "id": "af9a33b9-2574-4185-8533-7bc6d0e50968",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $json['nom_société'] }} - {{ $json.siret }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1vcWgzYr1uuPztBRKUOcCp5mWS5CR-TiN",
+          "mode": "list",
+          "cachedResultName": "Clients",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1vcWgzYr1uuPztBRKUOcCp5mWS5CR-TiN"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1680,
+        -704
+      ],
+      "id": "0b700353-1d2b-40ae-854e-ac7a44596c53",
+      "name": "Create folder",
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=00_ONBOARDING",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create folder').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1456,
+        -704
+      ],
+      "id": "86bd5c60-9592-4be6-92f1-f2964c57e411",
+      "name": "Create folder1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=01_JURIDIQUE",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create folder').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1232,
+        -704
+      ],
+      "id": "73a36e23-264e-498a-9568-12220fca8fb0",
+      "name": "Create folder2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=02_COMPTABILITE",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create folder').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1008,
+        -704
+      ],
+      "id": "068ba650-8506-4e46-9b0a-8e28f6193479",
+      "name": "Create folder3",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=04_FISCAL",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create folder').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -784,
+        -704
+      ],
+      "id": "bf0bf40a-eca9-4da3-8669-93aedbb44944",
+      "name": "Create folder4",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=05_LM",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create folder').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -560,
+        -704
+      ],
+      "id": "f6a87f65-92d8-460a-ba19-c524eedf9653",
+      "name": "Create folder5",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=03_SOCIAL",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create folder').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -112,
+        -784
+      ],
+      "id": "335ddfe0-03c0-468a-8532-ddd2e631ef8a",
+      "name": "Create folder6",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6fc8140b-2f26-4888-8275-ee3e72355433",
+              "leftValue": "={{ $('Google Sheets Trigger').item.json.paie.toString() }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -336,
+        -704
+      ],
+      "id": "d2e78bbb-6d94-4cd1-bb34-354dc9016a9b",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $('Google Sheets Trigger').item.json['nom_société'] }} - À valider",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        112,
+        -704
+      ],
+      "id": "60985ecd-edee-4d54-bcda-effc3b0c83ec",
+      "name": "Rechercher Dossier Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tu es chargé de classer des fichiers dans la bonne sous-catégorie de son dossier Drive, selon son nom de fichier.\n\nCatégories disponibles :\n- 00_ONBOARDING : documents de suivi, checklists, échanges avec le client \n  pendant la phase d'accueil\n- 01_JURIDIQUE : statuts de la société, extraits Kbis, registre des \n  bénéficiaires effectifs, accords d'actionnaires, procès-verbaux\n- 02_COMPTABILITE : FEC (Fichier des Écritures Comptables), balances, \n  liasses fiscales\n- 03_SOCIAL : UNIQUEMENT si le client a des salariés (paie) — contrats \n  de travail, DSN, bulletins de paie\n- 04_FISCAL : déclarations fiscales, échéances\n- 05_LM : lettre de mission signée par le client, devis\n\nDonnées du fichier à classer :\n- Nom du fichier : {{ $json.name }}\n- ID du fichier : {{ $json.id }}\n- ID du dossier actuel du fichier : {{ $('Rechercher Dossier Drive1').item.json.id }}\n- Ce client a-t-il des salariés (paie) :{{ $('Google Sheets Trigger').item.json.paie }}\n\nTable de correspondance catégorie → ID du dossier de destination \n(utilise EXCLUSIVEMENT ces ID, jamais le nom de la catégorie) :\n- 00_ONBOARDING → {{ $('Create folder1').item.json.id }}\n- 01_JURIDIQUE → {{ $('Create folder2').item.json.id }}\n- 02_COMPTABILITE → {{ $('Create folder3').item.json.id }}\n- 03_SOCIAL → {{ $if($('Create folder6').isExecuted, $('Create folder6').item.json.id, '') }} (utilisable UNIQUEMENT si \"Ce client a-t-il des salariés\" = Oui ci-dessus ; si vide, ne jamais choisir cette catégorie)\n- 04_FISCAL → {{ $('Create folder4').item.json.id }}\n- 05_LM → {{ $('Create folder5').item.json.id }}\n\n---\n\n⚠️ INSTRUCTIONS STRICTES — À RESPECTER SANS EXCEPTION :\n- Ne jamais interpréter, deviner ou déduire une catégorie en dehors \n  des mots-clés listés dans les règles ci-dessous.\n- Ne jamais raisonner sur le \"sens\", la \"nature\" ou le \"contexte\" \n  du nom du fichier pour contourner les règles.\n- Ne jamais traduire le nom du fichier (ex : \"shareholder\" ne doit \n  PAS être traduit en \"actionnaires\" pour matcher un mot-clé).\n- Si aucun mot-clé exact des règles 1 à 7 n'est trouvé dans le nom \n  du fichier, applique la règle 8 sans exception.\n- Ne jamais te contredire : choisis une seule catégorie, cite une \n  seule règle, pas de correction ni de note après coup.\n- La recherche de mots-clés est insensible à la casse \n  (majuscules/minuscules sont ignorées).\n\n---\n\nRÈGLES DE DÉCISION — Analyse le nom du fichier. Applique les règles \ndans l'ordre ci-dessous. Dès qu'un mot-clé correspond, utilise cette \ncatégorie et ARRÊTE. N'applique le défaut (règle 8) que si AUCUN \nmot-clé des règles 1 à 7 n'a été trouvé dans le nom du fichier.\n\nRègle 1 — PRIORITAIRE : Si le nom contient \"kbis\", \"k-bis\" ou \n\"registre_titres\" → 01_JURIDIQUE. \nTOUJOURS, sans aucune exception.\n\nRègle 2 : Si le nom contient \"statuts\", \"bénéficiaire\", \n\"immatriculation\", \"actionnaires\", \"accord_actionnaires\", \n\"pacte_associes\", \"pv_ag\", \"proces_verbal\" ou \"cession\" \n→ 01_JURIDIQUE.\n\nRègle 3 : Si le nom contient \"fec\", \"balance\", \"liasse\", \n\"grand_livre\" ou \"journal\" → 02_COMPTABILITE.\n\nRègle 4 : Si le nom contient \"contrat_travail\", \"dsn\", \n\"bulletin_paie\" ou \"salarié\" :\n  - ET \"Ce client a-t-il des salariés\" = Oui → 03_SOCIAL\n  - ET \"Ce client a-t-il des salariés\" = Non → 00_ONBOARDING \n    (ne jamais utiliser 03_SOCIAL dans ce cas)\n\nRègle 5 : Si le nom contient \"tva\", \"is\", \"cfe\", \"liasse_fiscale\", \n\"echeance\" ou \"declaration\" → 04_FISCAL.\n\nRègle 6 : Si le nom contient \"lettre_mission\", \"lm_signee\", \n\"mandat\" ou \"devis\" → 05_LM.\n\nRègle 7 : Si le nom contient \"onboarding\" ou \"checklist\" \n→ 00_ONBOARDING.\n\nRègle 8 — DÉFAUT (uniquement si aucune des règles 1 à 7 ne \ncorrespond) : → 00_ONBOARDING.\n\n⚠️ RAPPEL CRITIQUE : Ne jamais appliquer la règle 8 si un mot-clé \ndes règles 1 à 7 a été identifié dans le nom du fichier. La règle 8 \nn'existe que pour les fichiers dont le nom ne contient strictement \naucun mot-clé reconnu.\n\n---\n\nInstruction finale :\nUne fois la catégorie déterminée, appelle l'outil \"DeplacerFichier\" \navec :\n- fileId = l'ID du fichier donné ci-dessus (jamais le nom du fichier)\n- parentFolder = l'ID Drive correspondant à la catégorie choisie, \n  trouvé dans la table de correspondance ci-dessus (jamais le nom \n  de la catégorie comme \"01_JURIDIQUE\")\n\nNe réponds jamais sans avoir appelé cet outil.\n\nFormat de réponse (une seule ligne, pas de note ni de correction) :\n\"Le fichier [nom du fichier] a été classé dans [nom de la catégorie] \n(mot-clé détecté : [mot-clé trouvé] — règle [numéro]).\"",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        560,
+        -704
+      ],
+      "id": "de9c33f9-eb40-4a9f-9db6-9d7b3d732d32",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "=",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        336,
+        -704
+      ],
+      "id": "9a0d8f2e-d901-4cf6-b79a-f90d89a1a840",
+      "name": "Search files and folders",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File', ``, 'string') }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Parent_Folder', ``, 'string') }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        688,
+        -512
+      ],
+      "id": "8b408934-fec4-4d40-a69e-055285979235",
+      "name": "Move file in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "deleteFolder",
+        "folderNoRootId": {
+          "__rl": true,
+          "value": "={{ $('Rechercher Dossier Drive1').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        912,
+        -704
+      ],
+      "id": "7e999f03-2dfd-408e-9699-d19e2b216de8",
+      "name": "Delete folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-oss:20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        544,
+        -528
+      ],
+      "id": "dda33eee-3783-4535-9d87-6ad18de17c5a",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "6Y8FpvYhLX0sAe5z",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Google Sheets Trigger').item.json.parcours }}",
+                    "rightValue": "existante",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9d278427-9a4c-48c3-b6b2-8ab02d978255"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1136,
+        -704
+      ],
+      "id": "1518ae19-71cd-4365-9943-c09009a530bd",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Feuille 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8/edit#gid=0"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2128,
+        -704
+      ],
+      "id": "b1ada53f-0aff-42f3-bbb4-8852c14f79fc",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "mf0WVEtSiuwzT6dz",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-oss:120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        1552,
+        -528
+      ],
+      "id": "ce31fd16-4a6a-4cc9-9fa3-3e965a0406a8",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "6Y8FpvYhLX0sAe5z",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=- civilite_client : déduis la civilité du client (\"Madame\" ou \"Monsieur\") en te basant sur :\n  1. à défaut, le prénom du client {{ $('Google Sheets Trigger').item.json.nom_client }}\n  Si aucun indice fiable n'est disponible, renvoie \"Non renseigné\" plutôt que de deviner au hasard.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1536,
+        -704
+      ],
+      "id": "925075a1-6fb6-4408-b746-9018024ea8d9",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://account-d.docusign.com/oauth/token",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "urn:ietf:params:oauth:grant-type:jwt-bearer"
+            },
+            {
+              "name": "assertion",
+              "value": "={{ $json.jwt }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2064,
+        -688
+      ],
+      "id": "e99e8336-7a1c-4363-b88a-89f0b89374e8",
+      "name": "Get Token"
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\n\nconst integrationKey = \"13073994-9db2-4018-8cfe-10bfefca99c4\";\nconst userId = \"1a1f3699-2781-4a2c-ae13-5302be54d48b\";\nconst privateKey = `-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAvqkJHK35RCXmdDv9Ysvc0ev+vF07wBp6VoSYItuMxhEFpTGB\nHy6OLXCuEwm88CSiZnCOBmlF3mJJjUygfY/ByGHdKMUWpcFSKLD3V7M11dKH5v7z\nL5IFJpkkF5Cwtn7p49tQI3uHTYHOrDoVZabqVI1LEivIQCUV5qU60tOt9ZwehT8c\nBCa+C5HiGULZDR/FQcwxQxilCVpKIOwYRZ5uUszRrv8Zfh6YznycV0mvF+etsRIY\n85NrLCgNAxUAdmaz8PwtfuIkH81jdEiJwWJLrwGoWuHVkf7SA1+OfQ3jzU10wUx2\n9mPZtm9m3rK7OwwqgHcSaewbhqBQxm9YLUWA+wIDAQABAoIBAFd5rZ0TcwSh0PCu\nX2yXNRq5SJg6vIHAhDWywyxnB9kOEUWAB4p7bS8K/krs0ltpq3sNlBP789r6xF1I\ndW/2Z4Xc5L/iYSguoNfbjbgWmJIgdEr22TOPrr5NT+Jh97nbU8s/oa6N6/+TGXQq\neAu5/9RIOVO+c7N+cGRwlaMKDMvdCFuTMRm6ZzdgnaNnro91xtK90UX+MAkOYvRY\n4Op111xVPaZutdSiQvb4LvCiDEdLgXqBYlGAtY9VTMR126JFRL50caw7FrpUHAqB\nDN+q58P1stoPvbhnnZKTvioZaGo4WBJ+2Tl6smTVABP8RuS4usT8AJu5ojHCEkJr\nhLTQkXkCgYEA7cOFKiwi5Tmg4xLJfbh/OIGYeLh+we3pswm/ajdLQxd9/4sOvMsb\nemmaNKCm3N99+aebGQSLukaU2yc5AR37jUUgJiqXKhVRYQn4qylYRjMGb3+g5DNX\nE+F+DHOLUXGai8n6qNKPfyGVjLX0QuVfsk26ZXve9HLzlIaQfA8h7pMCgYEAzUik\nLoO13mGrjFjj23sBQbe6wV4f98s7KCtmlKXKAva3AFKRAi5OKvitAbs3cu8oLZKc\nsCAcxm6rz9PgY8qMUjFELqhftVoAVV6TJs6QYk3NYoi02T15R0BPpVh5zWJJUo6H\n/onlDPfzCGTbi8jfyGffyTg47FprLrbwcbd+PPkCgYEAq7TU2YTwWnyIzRRHQSzZ\na5Rj6WLL3/+SE4NJokp2ZuhzTPY+2WcQ3BGhlLokZ0RbtM0u/B1FT2wjmjU0PLNL\ndFVkh0ugyXqFv7+0vt9n6aJ11lXkeoj9LNVe810KUvHo+2UNSZhumxBE8U6CLUF7\nH8h0gU+4zu6pLC0V8RH4nlMCgYBGfKXbTuBYzoKf+zmp+C9zSEn48X/ajs7uORDN\nA6w8nkgx9SfTbuDqQl7tVEJy1YmfNFNW6n/W5tNZ1i+bNEZARqhZuPi8BX5N0d6H\nGbBcAMkAB17JpSEKhRuT87BHBHOWxFgP33tlm5G4lSEJe1zTrE8cAZESHu3kqW4g\nLdhLyQKBgQCIv2zCVDc6WA839mt2AFZhKgaxtLfOuvKkKdsmckWvnWO1I55qHWu2\n4Is53Q0yruNEtRmaTo6PpOb4HzOUWu1RJ15v5rE3TgdC4qO4OqqRRGal6wZ+eEQy\ndb2t2viM4EuMFOC5Ft5s9pJnCIzzXy4ZPEYcKQsoBD3ktAQ3QLuk5A==\n-----END RSA PRIVATE KEY-----`;\n\nfunction base64url(input) {\n  return Buffer.from(JSON.stringify(input)).toString('base64')\n    .replace(/=/g, '').replace(/\\+/g, '-').replace(/\\//g, '_');\n}\n\nconst header = { alg: \"RS256\", typ: \"JWT\" };\nconst now = Math.floor(Date.now() / 1000);\nconst payload = {\n  iss: integrationKey,\n  sub: userId,\n  aud: \"account-d.docusign.com\",\n  iat: now,\n  exp: now + 3600,\n  scope: \"signature impersonation\"\n};\n\nconst unsigned = base64url(header) + \".\" + base64url(payload);\nconst signature = crypto.sign(\"RSA-SHA256\", Buffer.from(unsigned), privateKey)\n  .toString('base64').replace(/=/g, '').replace(/\\+/g, '-').replace(/\\//g, '_');\n\nreturn [{ json: { jwt: unsigned + \".\" + signature } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1872,
+        -688
+      ],
+      "id": "bea952da-4a53-4cc5-87b0-bf5ed90cdf48",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -2128,
+        128
+      ],
+      "id": "9252ad6b-51f9-4be9-827a-22ccd3e16a61",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "envelopes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1008,
+        128
+      ],
+      "id": "f6a2a7cc-1306-4a03-9af3-19a3657a56cb",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://account-d.docusign.com/oauth/token",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "urn:ietf:params:oauth:grant-type:jwt-bearer"
+            },
+            {
+              "name": "assertion",
+              "value": "={{ $json.jwt }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1680,
+        128
+      ],
+      "id": "09a22568-0f4d-465f-88b9-153052a425ee",
+      "name": "Get Token1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\n\nconst integrationKey = \"13073994-9db2-4018-8cfe-10bfefca99c4\";\nconst userId = \"1a1f3699-2781-4a2c-ae13-5302be54d48b\";\nconst privateKey = `-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAvqkJHK35RCXmdDv9Ysvc0ev+vF07wBp6VoSYItuMxhEFpTGB\nHy6OLXCuEwm88CSiZnCOBmlF3mJJjUygfY/ByGHdKMUWpcFSKLD3V7M11dKH5v7z\nL5IFJpkkF5Cwtn7p49tQI3uHTYHOrDoVZabqVI1LEivIQCUV5qU60tOt9ZwehT8c\nBCa+C5HiGULZDR/FQcwxQxilCVpKIOwYRZ5uUszRrv8Zfh6YznycV0mvF+etsRIY\n85NrLCgNAxUAdmaz8PwtfuIkH81jdEiJwWJLrwGoWuHVkf7SA1+OfQ3jzU10wUx2\n9mPZtm9m3rK7OwwqgHcSaewbhqBQxm9YLUWA+wIDAQABAoIBAFd5rZ0TcwSh0PCu\nX2yXNRq5SJg6vIHAhDWywyxnB9kOEUWAB4p7bS8K/krs0ltpq3sNlBP789r6xF1I\ndW/2Z4Xc5L/iYSguoNfbjbgWmJIgdEr22TOPrr5NT+Jh97nbU8s/oa6N6/+TGXQq\neAu5/9RIOVO+c7N+cGRwlaMKDMvdCFuTMRm6ZzdgnaNnro91xtK90UX+MAkOYvRY\n4Op111xVPaZutdSiQvb4LvCiDEdLgXqBYlGAtY9VTMR126JFRL50caw7FrpUHAqB\nDN+q58P1stoPvbhnnZKTvioZaGo4WBJ+2Tl6smTVABP8RuS4usT8AJu5ojHCEkJr\nhLTQkXkCgYEA7cOFKiwi5Tmg4xLJfbh/OIGYeLh+we3pswm/ajdLQxd9/4sOvMsb\nemmaNKCm3N99+aebGQSLukaU2yc5AR37jUUgJiqXKhVRYQn4qylYRjMGb3+g5DNX\nE+F+DHOLUXGai8n6qNKPfyGVjLX0QuVfsk26ZXve9HLzlIaQfA8h7pMCgYEAzUik\nLoO13mGrjFjj23sBQbe6wV4f98s7KCtmlKXKAva3AFKRAi5OKvitAbs3cu8oLZKc\nsCAcxm6rz9PgY8qMUjFELqhftVoAVV6TJs6QYk3NYoi02T15R0BPpVh5zWJJUo6H\n/onlDPfzCGTbi8jfyGffyTg47FprLrbwcbd+PPkCgYEAq7TU2YTwWnyIzRRHQSzZ\na5Rj6WLL3/+SE4NJokp2ZuhzTPY+2WcQ3BGhlLokZ0RbtM0u/B1FT2wjmjU0PLNL\ndFVkh0ugyXqFv7+0vt9n6aJ11lXkeoj9LNVe810KUvHo+2UNSZhumxBE8U6CLUF7\nH8h0gU+4zu6pLC0V8RH4nlMCgYBGfKXbTuBYzoKf+zmp+C9zSEn48X/ajs7uORDN\nA6w8nkgx9SfTbuDqQl7tVEJy1YmfNFNW6n/W5tNZ1i+bNEZARqhZuPi8BX5N0d6H\nGbBcAMkAB17JpSEKhRuT87BHBHOWxFgP33tlm5G4lSEJe1zTrE8cAZESHu3kqW4g\nLdhLyQKBgQCIv2zCVDc6WA839mt2AFZhKgaxtLfOuvKkKdsmckWvnWO1I55qHWu2\n4Is53Q0yruNEtRmaTo6PpOb4HzOUWu1RJ15v5rE3TgdC4qO4OqqRRGal6wZ+eEQy\ndb2t2viM4EuMFOC5Ft5s9pJnCIzzXy4ZPEYcKQsoBD3ktAQ3QLuk5A==\n-----END RSA PRIVATE KEY-----`;\n\nfunction base64url(input) {\n  return Buffer.from(JSON.stringify(input)).toString('base64')\n    .replace(/=/g, '').replace(/\\+/g, '-').replace(/\\//g, '_');\n}\n\nconst header = { alg: \"RS256\", typ: \"JWT\" };\nconst now = Math.floor(Date.now() / 1000);\nconst payload = {\n  iss: integrationKey,\n  sub: userId,\n  aud: \"account-d.docusign.com\",\n  iat: now,\n  exp: now + 3600,\n  scope: \"signature impersonation\"\n};\n\nconst unsigned = base64url(header) + \".\" + base64url(payload);\nconst signature = crypto.sign(\"RSA-SHA256\", Buffer.from(unsigned), privateKey)\n  .toString('base64').replace(/=/g, '').replace(/\\+/g, '-').replace(/\\//g, '_');\n\nreturn [{ json: { jwt: unsigned + \".\" + signature } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1904,
+        128
+      ],
+      "id": "3d5e5f2f-7eb0-4aa2-be01-b3daf6cce15c",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8",
+          "mode": "list",
+          "cachedResultName": "Clients",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Feuille 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Google Sheets Trigger').item.json.id }}",
+            "statut_dossier": "Parcours assigné",
+            "regle_bloquante_statut": "controle fiscal prioritaire",
+            "regle_bloquante_date_creation": "={{ $now.format('dd/MM/yyyy HH:mm') }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nom_société",
+              "displayName": "nom_société",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email_client",
+              "displayName": "email_client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nom_client",
+              "displayName": "nom_client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "tel_client",
+              "displayName": "tel_client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "siret",
+              "displayName": "siret",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "parcours",
+              "displayName": "parcours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "paie",
+              "displayName": "paie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "juridique",
+              "displayName": "juridique",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "feu_vert",
+              "displayName": "feu_vert",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "date_cloture",
+              "displayName": "date_cloture",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nom_associé",
+              "displayName": "nom_associé",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email_associé",
+              "displayName": "email_associé",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "tel_associé",
+              "displayName": "tel_associé",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "statut_dossier",
+              "displayName": "statut_dossier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "regle_bloquante_statut",
+              "displayName": "regle_bloquante_statut",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "regle_bloquante_date_creation",
+              "displayName": "regle_bloquante_date_creation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "regle_bloquante_date_levee",
+              "displayName": "regle_bloquante_date_levee",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "regle_bloquante_commentaire",
+              "displayName": "regle_bloquante_commentaire",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "date_derniere_relance",
+              "displayName": "date_derniere_relance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "checklist_complete",
+              "displayName": "checklist_complete",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "silae_statut",
+              "displayName": "silae_statut",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "forme_juridique",
+              "displayName": "forme_juridique",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "pennylane_statut",
+              "displayName": "pennylane_statut",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "honoraires_comptabilite_annuel",
+              "displayName": "honoraires_comptabilite_annuel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "tarif_bulletin_paie",
+              "displayName": "tarif_bulletin_paie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "honoraires_juridique",
+              "displayName": "honoraires_juridique",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "capital_social",
+              "displayName": "capital_social",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "adresse_société ",
+              "displayName": "adresse_société ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1360,
+        -704
+      ],
+      "id": "6d70c508-c66a-42cd-8c85-82a8b6a6ef1e",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "elK5R6515RvJ26Xl",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://demo.docusign.net/restapi/v2.1/accounts/f90f7528-7b14-406e-b7e6-643705032612/envelopes",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "status ",
+              "value": "created"
+            },
+            {
+              "name": "from_date",
+              "value": "={{ $now.minus({days: 90}).toISO() }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer  {{ $json.access_token }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1456,
+        128
+      ],
+      "id": "192d9c2d-5afc-4703-ad0b-f940467d1653",
+      "name": "Lister Enveloppes Completed"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3f3a0e73-fae2-44b5-b48f-568686fa91d3",
+              "leftValue": "={{ $json.envelopes }}.toString()",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1232,
+        128
+      ],
+      "id": "ae29d4ec-8940-468b-93e1-34673cf45cf3",
+      "name": "IF - Enveloppes Trouvées"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fields = $json.textCustomFields || [];\n\nconst folder = fields.find(f => f.name === 'id_dossier');\nconst idField = fields.find(f => f.name === 'id');\n\nif (!folder || !folder.value) {\n  return [];\n}\n\nreturn [{\n  json: {\n    folderId: folder.value,\n    id: idField ? idField.value : null,\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        128
+      ],
+      "id": "b4e61f61-7c42-45d6-b840-dc366e51347e",
+      "name": "Extraire Folder ID pour enregistrer LM"
+    },
+    {
+      "parameters": {
+        "url": "=https://demo.docusign.net/restapi/v2.1/accounts/f90f7528-7b14-406e-b7e6-643705032612/envelopes/{{ $('Split Out').item.json.envelopeId }}/documents/combined",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Get Token1').item.json.access_token }}"
+            },
+            {
+              "name": "Content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -336,
+        128
+      ],
+      "id": "20f20a54-13a8-41a0-b86d-cdac3f23eb99",
+      "name": "Télécharger PDF Signé"
+    },
+    {
+      "parameters": {
+        "name": "={{ 'LM_signee'  + '.pdf' }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.folderId }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        336,
+        128
+      ],
+      "id": "a95acafa-265b-4d69-a5bc-a5afa7eb94cf",
+      "name": "Uploader vers 05_LM",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://demo.docusign.net/restapi/v2.1/accounts/f90f7528-7b14-406e-b7e6-643705032612/envelopes/e6e12477-c816-8f3c-816e-e4c05772159b/custom_fields",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer  {{ $('Get Token1').item.json.access_token }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -784,
+        128
+      ],
+      "id": "baf0aaa7-daa3-4183-998c-42f718cb00fd",
+      "name": "Récupérer CustomFields",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "Récupérer CustomFields:\npour chaque enveloppe DocuSign trouvée (signée), il va chercher les informations personnalisées qu'on a cachées dedans à la création(Créer Brouillon) — en particulier l'ID du dossier Drive 05_LM du client concerné.",
+        "height": 272,
+        "width": 272
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1584,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "760fb5fa-289f-48f4-aa62-f5193a46e7ff",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fields = $json.textCustomFields || [];\nconst folder = fields.find(f => f.name === 'id_dossier_05lm');\n\nif (!folder || !folder.value) {\n  return [];\n}\n\nreturn [{\n  json: {\n    folderId: folder.value\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1904,
+        352
+      ],
+      "id": "71970884-0958-45aa-aa93-792feedeef63",
+      "name": "Extraire Folder ID pour enregistrer LM1"
+    },
+    {
+      "parameters": {
+        "url": "=https://demo.docusign.net/restapi/v2.1/accounts/f90f7528-7b14-406e-b7e6-643705032612/envelopes/{{ $('Split Out').item.json.envelopeId }}/documents/combined",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Get Token1').item.json.access_token }}"
+            },
+            {
+              "name": "Content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1680,
+        352
+      ],
+      "id": "a408bb4b-28f1-4787-8f7f-931010c6e874",
+      "name": "Télécharger PDF Signé1"
+    },
+    {
+      "parameters": {
+        "name": "={{ 'LM_signee'  + '.pdf' }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.folderId }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1456,
+        352
+      ],
+      "id": "6b42d77c-fb9d-4b7f-af88-9cbe3a16e72e",
+      "name": "Uploader vers 05_LM1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://demo.docusign.net/restapi/v2.1/accounts/f90f7528-7b14-406e-b7e6-643705032612/envelopes/{{ $json.envelopeId }}/custom_fields",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer  {{ $('Get Token1').item.json.access_token }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -2128,
+        352
+      ],
+      "id": "aaa45bff-6bd9-438c-baba-1db747a30af8",
+      "name": "Récupérer CustomFields1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://demo.docusign.net/restapi/v2.1/accounts/f90f7528-7b14-406e-b7e6-643705032612/envelopes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"templateId\": \"efdf952b-4433-4d90-8679-593f31e3f5c9\",\n  \"status\": \"created\",\n  \"templateRoles\": [\n    {\n      \"roleName\": \"client\",\n      \"name\": \"{{ $('Google Sheets Trigger').item.json['nom_client'] }}\",\n      \"email\": \"{{ $('Google Sheets Trigger').item.json['email_client'] }}\",\n      \"tabs\": {\n        \"textTabs\": [\n          {\n            \"tabLabel\": \"nom_societe\",\n            \"value\": \"{{ $('Google Sheets Trigger').item.json['nom_société'] }}\",\n            \"locked\": true,\n            \"shared\": true\n          },\n          {\n            \"tabLabel\": \"nom_client\",\n            \"value\": \"{{ $('Google Sheets Trigger').item.json['nom_client'] }}\",\n            \"locked\": true,\n            \"shared\": true\n          },\n          {\n            \"tabLabel\": \"date_lettre\",\n            \"value\": \"{{ $now.format('dd/MM/yyyy') }}\",\n            \"locked\": true,\n            \"shared\": true\n          },\n          {\n            \"tabLabel\": \"forme_juridique\",\n            \"value\": \"{{ $('Get row(s) in sheet-sirene').item.json.informations_juridiques }}\",\n            \"locked\": true,\n            \"shared\": true\n          },\n          {\n            \"tabLabel\": \"date_cloture\",\n            \"value\": \"{{ $('Google Sheets Trigger').item.json['date_cloture'] }}\",\n            \"locked\": true,\n            \"shared\": true\n          },\n          {\n            \"tabLabel\": \"capital_social\",\n            \"value\": \"{{ $('Google Sheets Trigger').item.json['capital_social'].toString() }}\",\n            \"locked\": true,\n            \"shared\": true\n          },\n          {\n            \"tabLabel\": \"activite_societe\",\n            \"value\": \"{{ $('Get row(s) in sheet-sirene').item.json.activite_et_risque_comptable }}\",\n            \"locked\": true,\n            \"shared\": true\n          },\n          {\n            \"tabLabel\": \"adresse_societe\",\n            \"value\": \"{{ $('Get row(s) in sheet-sirene').item.json.col_15 }} {{ $('Get row(s) in sheet-sirene').item.json.col_16 }} {{ $('Get row(s) in sheet-sirene').item.json.col_17 }}, {{ $('Get row(s) in sheet-sirene').item.json.col_18 }} {{ $('Get row(s) in sheet-sirene').item.json.col_19 }}\",\n            \"locked\": true,\n            \"shared\": true\n          },\n          {\n            \"tabLabel\": \"honoraires_mensuel\",\n            \"value\": \"{{ $('Google Sheets Trigger').item.json['honoraires_comptabilite_annuel'] / 12 }}\",\n            \"locked\": true,\n            \"shared\": true\n          },\n          {\n            \"tabLabel\": \"honoraires_annuel\",\n            \"value\": \"{{ $('Google Sheets Trigger').item.json['honoraires_comptabilite_annuel'] }}\",\n            \"locked\": true,\n            \"shared\": true\n          },\n          {\n            \"tabLabel\": \"honoraires_juridique\",\n            \"value\": \"{{ $('Google Sheets Trigger').item.json['honoraires_juridique'].toString() }}\",\n            \"locked\": true,\n            \"shared\": true\n          },\n          {\n            \"tabLabel\": \"madame_monsieur\",\n            \"value\": \"{{ $('AI Agent1').item.json.output }}\",\n            \"locked\": true,\n            \"shared\": true\n          }\n        ]\n      }\n    },\n    {\n      \"roleName\": \"associé\",\n      \"name\": \"{{ $('Google Sheets Trigger').item.json['nom_associé'] }}\",\n      \"email\": \"{{ $('Google Sheets Trigger').item.json['email_associé'] }}\",\n      \"tabs\": {\n        \"textTabs\": [\n          {\n            \"tabLabel\": \"nom_associe\",\n            \"value\": \"{{ $('Google Sheets Trigger').item.json['nom_associé'] }}\",\n            \"locked\": true,\n            \"shared\": true\n          }\n        ]\n      }\n    }\n  ],\n  \"customFields\": {\n    \"textCustomFields\": [\n      {\n        \"name\": \"id_dossier\",\n        \"value\": \"{{ $('Create folder').item.json.id }}\",\n        \"required\": false,\n        \"show\": false\n      },\n      {\n        \"name\": \"id\",\n        \"value\": \"{{ $('Google Sheets Trigger').item.json['id'] }}\",\n        \"required\": false,\n        \"show\": false\n      }\n\n    ]\n  }\n}\n\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2272,
+        -704
+      ],
+      "id": "b2f8253d-9b87-4c5d-b7f8-86cd954c13a6",
+      "name": "Créer Brouillon"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "=05_LM",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.folderId }}",
+            "mode": "id"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -112,
+        48
+      ],
+      "id": "7f5712e4-7035-4190-810a-1f2f8013b602",
+      "name": "Search dossier lm",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TILiazhtZGTzeSLK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        112,
+        128
+      ],
+      "id": "d37fbc22-9cda-43fc-9a0b-aee61240d913",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8",
+          "mode": "list",
+          "cachedResultName": "Clients",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Feuille 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gUzQGr4b-uscbiO-m8bXe67_O6JEdsmWcIZLlyp2FB8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Extraire Folder ID pour enregistrer LM').item.json.id }}",
+            "statut_dossier": "LM signée"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nom_société",
+              "displayName": "nom_société",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email_client",
+              "displayName": "email_client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nom_client",
+              "displayName": "nom_client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "tel_client",
+              "displayName": "tel_client",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "siret",
+              "displayName": "siret",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "parcours",
+              "displayName": "parcours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "paie",
+              "displayName": "paie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "juridique",
+              "displayName": "juridique",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "feu_vert",
+              "displayName": "feu_vert",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nom_associé",
+              "displayName": "nom_associé",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email_associé",
+              "displayName": "email_associé",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "tel_associé",
+              "displayName": "tel_associé",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "statut_dossier",
+              "displayName": "statut_dossier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "regle_bloquante_statut",
+              "displayName": "regle_bloquante_statut",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "regle_bloquante_date_creation",
+              "displayName": "regle_bloquante_date_creation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "regle_bloquante_date_levee",
+              "displayName": "regle_bloquante_date_levee",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "regle_bloquante_commentaire",
+              "displayName": "regle_bloquante_commentaire",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "date_derniere_relance",
+              "displayName": "date_derniere_relance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "checklist_complete",
+              "displayName": "checklist_complete",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "silae_statut",
+              "displayName": "silae_statut",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "forme_juridique",
+              "displayName": "forme_juridique",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "pennylane_statut",
+              "displayName": "pennylane_statut",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "honoraires_comptabilite_annuel",
+              "displayName": "honoraires_comptabilite_annuel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "tarif_bulletin_paie",
+              "displayName": "tarif_bulletin_paie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "honoraires_juridique",
+              "displayName": "honoraires_juridique",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "capital_social",
+              "displayName": "capital_social",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "adresse_société ",
+              "displayName": "adresse_société ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        128
+      ],
+      "id": "a190e125-8e0d-4b11-99ca-336a48f00dc0",
+      "name": "statut_dossier LM signée",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "elK5R6515RvJ26Xl",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "le probleme si Trigger est foncionnelle pour les 3 parcours\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        112,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "e49ea5d9-1ed0-4f38-8532-c975989b9dfd",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "sellsy\n",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1296,
+        -800
+      ],
+      "typeVersion": 1,
+      "id": "87d78ba6-286e-4eab-900a-09d308dab92a",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Create folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder": {
+      "main": [
+        [
+          {
+            "node": "Create folder1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder1": {
+      "main": [
+        [
+          {
+            "node": "Create folder2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder2": {
+      "main": [
+        [
+          {
+            "node": "Create folder3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder3": {
+      "main": [
+        [
+          {
+            "node": "Create folder4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder4": {
+      "main": [
+        [
+          {
+            "node": "Create folder5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder5": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder6": {
+      "main": [
+        [
+          {
+            "node": "Rechercher Dossier Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Create folder6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rechercher Dossier Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rechercher Dossier Drive1": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Delete folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete folder": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Token": {
+      "main": [
+        [
+          {
+            "node": "Créer Brouillon",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Get Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Récupérer CustomFields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Token1": {
+      "main": [
+        [
+          {
+            "node": "Lister Enveloppes Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Get Token1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lister Enveloppes Completed": {
+      "main": [
+        [
+          {
+            "node": "IF - Enveloppes Trouvées",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Enveloppes Trouvées": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraire Folder ID pour enregistrer LM": {
+      "main": [
+        [
+          {
+            "node": "Télécharger PDF Signé",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Télécharger PDF Signé": {
+      "main": [
+        [
+          {
+            "node": "Search dossier lm",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Uploader vers 05_LM": {
+      "main": [
+        [
+          {
+            "node": "statut_dossier LM signée",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Récupérer CustomFields": {
+      "main": [
+        [
+          {
+            "node": "Extraire Folder ID pour enregistrer LM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraire Folder ID pour enregistrer LM1": {
+      "main": [
+        [
+          {
+            "node": "Télécharger PDF Signé1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Télécharger PDF Signé1": {
+      "main": [
+        [
+          {
+            "node": "Uploader vers 05_LM1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Récupérer CustomFields1": {
+      "main": [
+        [
+          {
+            "node": "Extraire Folder ID pour enregistrer LM1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search dossier lm": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Uploader vers 05_LM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "92d3627a-ef35-4874-9c2c-4118bcb84a3f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "276b75ddf92a47b01772b58ed8bd2e37f8a10b5a9f518021c98717c626acb239"
+  },
+  "nodeGroups": [],
+  "id": "NjN1GQiLZ6nXxiOB",
+  "tags": []
+}

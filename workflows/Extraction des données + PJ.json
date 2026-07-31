@@ -1,0 +1,523 @@
+{
+  "name": "Extraction des données + PJ",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const messages = $('Start').first().json.messages_firstItem || [];\nconst attachments = [];\nconst vus = new Set();\n\nconst typesAutorises = [\n  'application/pdf',\n  'image/jpeg', \n  'image/png',\n  'image/jpg',\n  'application/msword',\n  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'\n];\n\nfunction extractAttachments(parts, messageId) {\n  if (!parts) return;\n  for (const part of parts) {\n    if (part.body?.attachmentId && part.filename && typesAutorises.includes(part.mimeType)) {\n      if (!vus.has(part.filename)) {\n        vus.add(part.filename);\n        attachments.push({\n          messageId,\n          attachmentId: part.body.attachmentId,\n          filename: part.filename,\n          mimeType: part.mimeType\n        });\n      }\n    }\n    if (part.parts) extractAttachments(part.parts, messageId);\n  }\n}\n\nfor (const msg of messages) {\n  if (msg.payload?.parts) extractAttachments(msg.payload.parts, msg.id);\n}\n\nif (attachments.length === 0) return [{ json: { statut: 'aucune_piece_jointe' } }];\nreturn attachments.map(att => ({ json: att }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3760,
+        528
+      ],
+      "id": "3e1f073d-74d3-4261-8ae2-1086ea36cc58",
+      "name": "JS-Extraire Pièces Jointes"
+    },
+    {
+      "parameters": {
+        "jsCode": "function getBody(payload) {\n  if (!payload) return '';\n  \n  if (payload.body?.data) {\n    return Buffer.from(payload.body.data, 'base64').toString('utf-8');\n  }\n  \n  if (payload.parts) {\n    for (const part of payload.parts) {\n      if (part.mimeType === 'text/plain' && part.body?.data) {\n        return Buffer.from(part.body.data, 'base64').toString('utf-8');\n      }\n    }\n    for (const part of payload.parts) {\n      const nested = getBody(part);\n      if (nested) return nested;\n    }\n  }\n  \n  return '';\n}\n\nconst messages = $('Start').first().json.messages_firstItem || [];\nconst texteEmails = messages.map(m => {\n  const h = m.payload?.headers || [];\n  const de = h.find(x => x.name === 'From')?.value || '';\n  const sujet = h.find(x => x.name === 'Subject')?.value || '';\n  const corps = getBody(m.payload) || m.snippet || '';\n  return `De: ${de} | Objet: ${sujet}\\n${corps}`;\n}).join('\\n---\\n');\n\nconst items = $input.all();\nconst hashVus = new Set();\nconst fichiers = [];\nconst today = new Date().toISOString().split('T')[0];\nconst nomSociete = 'SOCIETE';\n\nfor (const item of items) {\n  const hash = item.json.hash || '';\n  if (!hash || hashVus.has(hash)) continue;\n  hashVus.add(hash);\n\n  fichiers.push({\n    filename: `${today}_${nomSociete}_${item.json.filename || 'document'}`,\n    filenameOriginal: item.json.filename || 'document',\n    mimeType: item.json.mimeType || '',\n    hash,\n    texteOCR: item.json.text || item.json.texteOCR || '',\n    messageId: item.json.messageId || '',\n    attachmentId: item.json.attachmentId || '',\n    malware: item.json.malware || false,\n    statut: 'valide'\n  });\n}\n\nconst texteOCR = fichiers.map((f, i) =>\n  `=== Fichier ${i+1} : ${f.filenameOriginal} ===\\n${f.texteOCR}`\n).join('\\n\\n');\n\nconst clientId = `CLI-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;\n\nreturn [{ json: { texteEmails, texteOCR, fichiers, clientId, today } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2320,
+        528
+      ],
+      "id": "bf01bb7c-49a5-4bc7-9549-597d8a65eb1e",
+      "name": "JS-Préparer Données Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tu es un assistant pour Colead Finance, cabinet comptable.\n\nÉTAPES OBLIGATOIRES DANS L'ORDRE :\n\n1. Analyse les EMAILS et PIÈCES JOINTES OCR fournis\n\n2. Extrais, en vérifiant la cohérence entre les EMAILS et les PIÈCES JOINTES OCR pour chaque champ :\n   * nom_societe : nom exact de la société. \n   * email_expediteur : l'adresse email brute de l'expéditeur du message sans aucun traitement ni filtrage. Recopie-la telle quelle.\n   * email_client : l'adresse email du client, qui doit TOUJOURS être différente de email_expediteur ci-dessus. Cherche dans le corps de l'email (destinataires, signatures, adresses mentionnées) ou dans les pièces jointes une adresse email distincte de email_expediteur. Ignore également toute adresse contenant \"colead\" ou \"onboarding\" (insensible à la casse), ou les adresses jalloulieya27@gmail.com et eyajallouli0808@gmail.com, qui sont toujours internes au cabinet. Si aucune adresse valide et différente de email_expediteur n'est trouvée, mets \"Non renseigné\".\n   * siret : 14 chiffres sans espaces. Si le SIRET mentionné dans l'email et celui trouvé dans les pièces jointes sont différents, mets \"Erreur\" dans ce champ. Si absent partout, mets \"Non renseigné\".\n   * parcours : \"creation\" si nouvelle société / \"existante\" si société active / \"confrere\" si transfert cabinet\n   * paie : true si gestion de paie mentionnée / sinon false (booléen, pas de guillemets)\n   * juridique : true si juridique ou statuts mentionnés / sinon false (booléen, pas de guillemets)\n   * honoraires_comptabilite_annuel : montant annuel HT des honoraires de comptabilité (nombre uniquement, sans symbole €). Si un montant mensuel est donné, multiplie par 12 pour obtenir l'annuel. Si absent, mets \"Non renseigné\".\n   * tarif_bulletin_paie : montant HT par bulletin de paie par mois (nombre uniquement). Si absent ou si paie = false, mets \"Non renseigné\".\n   * honoraires_juridique : montant HT facturé pour la création de société ou les formalités juridiques (nombre uniquement, hors frais de greffe et hors frais de publicité légale). Si absent ou si juridique = false, mets \"Non renseigné\".\n   * capital_social : montant du capital social de la société à créer (nombre uniquement). Ce n'est PAS un honoraire. Si absent, mets \"Non renseigné\".\n   * date_cloture : date de clôture de l'exercice comptable de la société, au format JJ/MM (ex: \"31/12\" ou \"9/9\"). Cherche PARTOUT : dans les statuts (article souvent intitulé \"Exercice social\" ou \"Année sociale\") ET dans le corps des emails si le client la mentionne directement. Ignore l'année si elle est mentionnée, ne garde que jour/mois. Si absent partout, mets \"Non renseigné\".\n   * nom_client : nom et prénom du dirigeant ou contact client avec la première lettre de chaque mot en majuscule (ex: \"Pierre Martin\", pas \"pierre martin\"). Cherche dans la signature de l'email ou dans les pièces jointes (ex: nom du dirigeant sur le Kbis). Si absent, mets \"Non renseigné\".\n   * tel_client : numéro de téléphone du client, format brut tel que trouvé. Cherche dans la signature de l'email ou le corps du message. Si absent, mets \"Non renseigné\".\n   * nom_associé : nom et prénom de l'associé Colead Finance en charge du dossier avec la première lettre de chaque mot en majuscule (ex: \"Zied El Arbi\", pas \"zied el arbi\"). Cherche dans la signature de l'email de l'expéditeur. Si absent, mets \"Non renseigné\".\n   * email_associé : adresse email de l'associé Colead Finance. Généralement identique à email_expediteur. Si absent, mets \"Non renseigné\".\n   * tel_associé : numéro de téléphone de l'associé, trouvé dans sa signature email (souvent précédé de 📞 ou \"Tél\"). Si absent, mets \"Non renseigné\".\n   * id : utilise directement la valeur fournie dans {{ $json.clientId }}, ne la génère pas toi-même\n\n3. Retourne UNIQUEMENT ce JSON et rien d'autre :\n   {\n   \"id\": \"...\",\n   \"nom_societe\": \"...\",\n   \"email_expediteur\": \"...\",\n   \"email_client\": \"...\",\n   \"siret\": \"...\",\n   \"parcours\": \"...\",\n   \"paie\": true/false,\n   \"juridique\": true/false,\n   \"honoraires_comptabilite_annuel\": \"...\",\n   \"tarif_bulletin_paie\": \"...\",\n   \"honoraires_juridique\": \"...\",\n   \"capital_social\": \"...\",\n   \"date_cloture\": \"...\",\n   \"nom_client\": \"...\",\n   \"tel_client\": \"...\",\n   \"nom_associé\": \"...\",\n   \"email_associé\": \"...\",\n   \"tel_associé\": \"...\"\n   }\n\nRÈGLES :\n* Si une info est absente partout (email ET pièces jointes), mets \"Non renseigné\"\n* Si une info est présente mais incohérente entre l'email et les pièces jointes, mets \"Erreur\" dans ce champ précis uniquement\n* email_client doit TOUJOURS être différent de email_expediteur — ne jamais recopier la même valeur dans les deux champs\n* email_client ne doit jamais contenir \"colead\" ou \"onboarding\", ni être l'une des adresses internes fixes du cabinet\n* email_associé est généralement identique à email_expediteur, sauf si un email différent est explicitement mentionné comme celui de l'associé responsable du dossier\n* Ne confonds pas nom_client (le dirigeant de la société cliente) avec nom_associé (le collaborateur du cabinet Colead Finance)\n* Ne confonds JAMAIS honoraires_comptabilite_annuel, honoraires_juridique et capital_social — la comptabilité c'est le suivi annuel des comptes, le juridique c'est la création de société, et le capital social c'est l'argent du client dans sa société (pas un honoraire)\n* Si le mail mentionne un montant mensuel de comptabilité (ex: \"210€/mois\"), calcule l'annuel (210 x 12 = 2520) et mets 2520 dans honoraires_comptabilite_annuel\n* honoraires_juridique ne doit PAS inclure les frais de greffe ou de publicité légale\n* Tous les montants sont des nombres purs sans symbole € et en HT\n* paie et juridique doivent être des booléens true ou false (sans guillemets), pas des chaînes de texte \"true\" ou \"false\"\n* Tous les noms de personnes (nom_client, nom_associé) doivent avoir la première lettre de chaque mot en majuscule\n* date_cloture doit être cherchée à la fois dans les statuts (pièces jointes OCR) et dans le corps des emails\n* Ne jamais inclure feu_vert dans le JSON\n* Ne retourne RIEN d'autre que le JSON — pas d'explication, pas de texte avant ou après\n\nEMAILS :\n{{ $json.texteEmails }}\n\nPIÈCES JOINTES OCR :\n{{ $json.texteOCR }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -2144,
+        528
+      ],
+      "id": "f9005a09-191b-4542-984e-2d6c0a1eeab4",
+      "name": "AI Agent-Extraction Client"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "5hhI6ESi7pNc0mgq",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/5hhI6ESi7pNc0mgq",
+          "cachedResultName": "traitementPJ"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "attachmentId": "={{ $json.attachmentId }}",
+            "messageId": "={{ $json.messageId }}",
+            "filename": "={{ $json.filename }}",
+            "mimeType": "={{ $json.mimeType }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "attachmentId",
+              "displayName": "attachmentId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "messageId",
+              "displayName": "messageId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "filename",
+              "displayName": "filename",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "mimeType",
+              "displayName": "mimeType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -3424,
+        416
+      ],
+      "id": "028e8b12-7ed8-47d5-8c6b-584e8f131fb8",
+      "name": "Call 'traitementPJ'",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "model": "gpt-oss:120b",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -2112,
+        704
+      ],
+      "id": "8ab24b98-3ea3-4292-9a5a-39ef71043c94",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "6Y8FpvYhLX0sAe5z",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst results = [];\n\nfor (let i = 0; i < items.length; i++) {\n\n  const base64Standard = items[i].json.data\n    .replace(/-/g, '+')\n    .replace(/_/g, '/');\n\n  const pdfBuffer = Buffer.from(base64Standard, 'base64');\n\n  results.push({\n    json: items[i].json,\n    binary: {\n      data: await this.helpers.prepareBinaryData(\n        pdfBuffer,\n        items[i].json.filename || 'document.pdf',\n        'application/pdf'\n      )\n    }\n  });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3168,
+        400
+      ],
+      "id": "e4ef273b-1e33-46fe-8be0-08a2251d8a9e",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "63027350-b13c-4d62-9583-4fa5ed557528",
+              "leftValue": "={{ $json.statut }}",
+              "rightValue": "valide",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2640,
+        512
+      ],
+      "id": "89a8f764-470a-4007-aade-d09bcda5266f",
+      "name": "If- Fichiers Valides"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst originaux = $('JS-Extraire Pièces Jointes').all();\nconst hashVus = new Set();\nconst resultats = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const item = items[i].json;\n  const orig = originaux[i]?.json || {};\n\n  const hash = item.hash || '';\n  if (hashVus.has(hash)) continue;\n  hashVus.add(hash);\n\n  resultats.push({\n    json: {\n      filename: orig.filename || 'document',\n      mimeType: orig.mimeType || '',\n      hash,\n      texteOCR: item.text || item.texteOCR || '',\n      messageId: orig.messageId || '',\n      attachmentId: orig.attachmentId || '',\n      malware: item.malware || false,\n      statut: 'valide'\n    }\n  });\n}\n\nif (resultats.length === 0) {\n  return [{ json: { statut: 'aucun_fichier_valide' } }];\n}\nreturn resultats;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2784,
+        496
+      ],
+      "id": "7fdd36f8-7cdd-4e33-86fa-bbafd755516c",
+      "name": "JS-Dédupliquer "
+    },
+    {
+      "parameters": {
+        "binaryData": true,
+        "type": "MD5",
+        "dataPropertyName": "hash"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "position": [
+        -2928,
+        384
+      ],
+      "id": "cf252e0b-d241-4096-a05b-1e7e114b2d0b",
+      "name": "Crypto-Hash MD5 Fichier"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "35d50c4c-09dd-4cf9-80fe-ab5d18918763",
+              "leftValue": "={{ $json.attachmentId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "bc349191-154d-48df-bc16-f1bb5ef103e4",
+              "leftValue": "={{ $json.messageId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -3584,
+        528
+      ],
+      "id": "2fd0ecc4-fcbc-4f3c-aef7-b499e49517f7",
+      "name": "If there is an attachment"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.output;\nlet parsed;\ntry {\n  parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;\n} catch (e) {\n  return [{\n    json: {\n      ...$json,\n      valide: false,\n      champs_erreur: ['parsing_json'],\n      details_erreurs: [{ champ: 'parsing_json', valeur: 'Impossible de parser la sortie de l\\'agent' }]\n    }\n  }];\n}\n\n// Liste des champs essentiels à vérifier — les autres champs ne bloquent pas la validation\nconst champsAVerifier = ['id', 'nom_societe', 'email_client', 'parcours', 'paie', 'juridique'];\n\nconst valeursInvalides = ['erreur', 'non renseigné', 'non renseigne'];\nconst champsEnErreur = [];\nconst detailsErreurs = [];\n\nfor (const cle of champsAVerifier) {\n  const valeur = parsed[cle];\n  if (typeof valeur === 'string' && valeursInvalides.includes(valeur.trim().toLowerCase())) {\n    champsEnErreur.push(cle);\n    detailsErreurs.push({ champ: cle, valeur: valeur });\n  }\n}\n\nconst valide = champsEnErreur.length === 0;\n\nreturn [{\n  json: {\n    ...parsed,\n    valide,\n    champs_erreur: champsEnErreur,\n    details_erreurs: detailsErreurs,\n    resume_erreurs: detailsErreurs.map(d => `${d.champ}: ${d.valeur}`).join(', ')\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1856,
+        560
+      ],
+      "id": "17d2bbea-9d63-40ed-afe1-294234fd8342",
+      "name": "JS-Valider Extraction"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d751e442-60a9-4dff-be20-6463e0cfa458",
+              "name": "output_replace",
+              "value": "={{ $('AI Agent-Extraction Client').item.json.output.replace(/```json|```/g, '').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "86e5b664-7163-4151-8015-ae68c62065a8",
+              "name": "output",
+              "value": "={{ $('AI Agent-Extraction Client').item.json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "aa0b3c1f-8c2a-4d40-8d0b-e7ad5f33c2d9",
+              "name": "clientId",
+              "value": "={{ $('JS-Préparer Données Agent').item.json.clientId }}",
+              "type": "string"
+            },
+            {
+              "id": "7de979ff-cd2e-4d47-8f52-f4aabad8066a",
+              "name": "output_firstItem",
+              "value": "={{ $('AI Agent-Extraction Client').first().json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "7604af01-bbda-4dc9-859b-290123e43f9c",
+              "name": "JSDdupliquer__allItems",
+              "value": "={{ $('JS-Dédupliquer ').all() }}",
+              "type": "string"
+            },
+            {
+              "id": "0be5299b-c99e-449d-a782-3ddfa5a79524",
+              "name": "today",
+              "value": "={{ $('JS-Préparer Données Agent').item.json.today }}",
+              "type": "string"
+            },
+            {
+              "id": "2ae693ee-e909-4a36-85c1-3ed06b082670",
+              "name": "texteOCR",
+              "value": "={{ $('JS-Dédupliquer ').item.json.texteOCR }}",
+              "type": "string"
+            },
+            {
+              "id": "57b23759-e197-4a9b-addd-4836d8ad9232",
+              "name": "filename",
+              "value": "={{ $('JS-Dédupliquer ').item.json.filename }}",
+              "type": "string"
+            },
+            {
+              "id": "d085acc9-d0f6-4529-b3b7-4263ffcde40a",
+              "name": "_firstItem",
+              "value": "={{ $('AI Agent-Extraction Client').first().json }}",
+              "type": "string"
+            },
+            {
+              "id": "fa8a226b-cd50-4a5c-aaa6-3a694eaccb67",
+              "name": "valide",
+              "value": "={{ $json.valide }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1648,
+        560
+      ],
+      "id": "2c2d635d-6110-4175-a59d-2d3863927f6f",
+      "name": "Return"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "messages_firstItem",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "625e05d1-a13e-41b8-a573-b3b3d11fb744",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -3968,
+        528
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "JS-Extraire Pièces Jointes": {
+      "main": [
+        [
+          {
+            "node": "If there is an attachment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS-Préparer Données Agent": {
+      "main": [
+        [
+          {
+            "node": "AI Agent-Extraction Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent-Extraction Client": {
+      "main": [
+        [
+          {
+            "node": "JS-Valider Extraction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'traitementPJ'": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent-Extraction Client",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Crypto-Hash MD5 Fichier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If- Fichiers Valides": {
+      "main": [
+        [
+          {
+            "node": "JS-Préparer Données Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS-Dédupliquer ": {
+      "main": [
+        [
+          {
+            "node": "If- Fichiers Valides",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto-Hash MD5 Fichier": {
+      "main": [
+        [
+          {
+            "node": "JS-Dédupliquer ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If there is an attachment": {
+      "main": [
+        [
+          {
+            "node": "Call 'traitementPJ'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "JS-Dédupliquer ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "JS-Extraire Pièces Jointes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS-Valider Extraction": {
+      "main": [
+        [
+          {
+            "node": "Return",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "26629d9d-5942-4574-a40a-4aeffa7dafba",
+  "meta": {
+    "instanceId": "276b75ddf92a47b01772b58ed8bd2e37f8a10b5a9f518021c98717c626acb239"
+  },
+  "nodeGroups": [],
+  "id": "9jkTPbFiFkIU5XCD",
+  "tags": []
+}

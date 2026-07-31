@@ -3,69 +3,56 @@
   "nodes": [
     {
       "parameters": {
-        "url": "=https://gmail.googleapis.com/gmail/v1/users/onboarding.cabinet@gmail.com/messages/{{ $json.messageId }}/attachments/{{ $json.attachmentId }}",
+        "url": "=https://gmail.googleapis.com/gmail/v1/users/{{ $env.MAIL_ONBOARDING }}/messages/{{ $json.messageId }}/attachments/{{ $json.attachmentId }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "gmailOAuth2",
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "file"
-            }
-          }
-        }
+        "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        368,
-        656
+        0,
+        176
       ],
-      "id": "b8590499-20ae-48ee-a45d-8f2a58908e94",
+      "id": "38257130-6207-4b5a-a307-4f8626735f77",
       "name": "HTTP-Télécharger Binaire Gmail",
       "credentials": {
         "gmailOAuth2": {
-          "id": "WVafeGatVigO9G7A",
-          "name": "Gmail account 4"
+          "id": "OJhqSL3TB54B6eGJ",
+          "name": "Gmail account"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "http://localhost:9001/ocr",
+        "url": "http://ocr:9001/ocr",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "gmailOAuth2",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messageId\": \"{{ $json.messageId }}\",\n  \"attachmentId\": \"{{ $json.attachmentId }}\",\n  \"userEmail\": \"onboarding.cabinet@gmail.com\",\n  \"filename\": \"{{ $json.filename }}\",\n  \"mimeType\": \"{{ $json.mimeType }}\"\n}",
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "json"
-            }
-          },
-          "timeout": 120000
-        }
+        "jsonBody": "={\n  \"messageId\": \"{{ $json.messageId }}\",\n  \"attachmentId\": \"{{ $json.attachmentId }}\",\n  \"userEmail\": \"{{ $env.MAIL_ONBOARDING }}\",\n  \"filename\": \"{{ $json.filename }}\",\n  \"mimeType\": \"{{ $json.mimeType }}\"\n}",
+        "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        736,
-        544
+        0,
+        0
       ],
-      "id": "afea90a0-29d6-40c9-a1b3-fa18ac0777bd",
+      "id": "3f87c9dd-1f15-40bb-8696-5f30590c2e69",
       "name": "HTTP-OCR",
       "credentials": {
         "gmailOAuth2": {
-          "id": "WVafeGatVigO9G7A",
-          "name": "Gmail account 4"
+          "id": "OJhqSL3TB54B6eGJ",
+          "name": "Gmail account"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "http://127.0.0.1:9000/scan",
+        "url": "http://clamav:9000/scan",
         "sendBody": true,
         "contentType": "multipart-form-data",
         "bodyParameters": {
@@ -78,16 +65,16 @@
           ]
         },
         "options": {
-          "timeout": 60000
+          "timeout": 600000
         }
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        512,
-        832
+        464,
+        352
       ],
-      "id": "674945b5-e7d8-4b00-85b1-aa74ad1c96aa",
+      "id": "59ac7ec8-348a-4afb-97c7-0c110a259852",
       "name": "HTTP-ClamAV"
     },
     {
@@ -117,10 +104,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        736,
-        832
+        640,
+        352
       ],
-      "id": "27dd358c-f16d-4410-9525-3ab566d3421f",
+      "id": "8bc43ff0-6c57-4e03-9ad5-ca010aa75adb",
       "name": "If-Fichier Sain"
     },
     {
@@ -136,9 +123,9 @@
       "typeVersion": 3.2,
       "position": [
         960,
-        672
+        208
       ],
-      "id": "fd8cdb6d-2afd-4b18-97f2-f710691739fe",
+      "id": "12c6ef29-ff18-4e2f-94fb-d4ae1c6b5c48",
       "name": "Merge-OCR+ClamAV+Fichier"
     },
     {
@@ -160,14 +147,29 @@
           ]
         }
       },
-      "id": "e9095450-9cee-41e0-b9bf-9a260a3259e4",
+      "id": "bbbf2a7b-ed4f-4498-b412-718e59c7b485",
       "typeVersion": 1.1,
       "name": "Start",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "position": [
-        160,
-        656
+        -240,
+        176
       ]
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        256,
+        352
+      ],
+      "id": "3a4f4cce-9c03-4038-af02-7cb174fc7d27",
+      "name": "Convert to File"
     }
   ],
   "pinData": {},
@@ -176,12 +178,7 @@
       "main": [
         [
           {
-            "node": "HTTP-OCR",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "HTTP-ClamAV",
+            "node": "Convert to File",
             "type": "main",
             "index": 0
           },
@@ -234,6 +231,22 @@
             "node": "HTTP-Télécharger Binaire Gmail",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "HTTP-OCR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "HTTP-ClamAV",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -245,10 +258,11 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "ec19ea14-2702-4759-82cb-39c983957594",
+  "versionId": "3f654816-4755-490b-bc01-5a5d66925f69",
   "meta": {
-    "instanceId": "995d08d1a91a65414360eea25ea5ded11608110e1547365adc6effc9af7ac614"
+    "instanceId": "276b75ddf92a47b01772b58ed8bd2e37f8a10b5a9f518021c98717c626acb239"
   },
-  "id": "Aa5OaMhAGgUESmrH",
+  "nodeGroups": [],
+  "id": "5hhI6ESi7pNc0mgq",
   "tags": []
 }
